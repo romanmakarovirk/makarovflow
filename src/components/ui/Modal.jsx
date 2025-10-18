@@ -33,25 +33,23 @@ const Modal = ({
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden relative ${className}`}
+              className={`bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden ${className}`}
             >
-              {/* Close button - always visible */}
-              <button
-                onClick={handleClose}
-                className="absolute top-4 right-4 z-10 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
-              >
-                <X size={24} />
-              </button>
-
               {/* Header */}
               {title && (
-                <div className="flex items-center justify-between p-6 pr-14 border-b border-gray-200 dark:border-gray-700">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h2>
+                <div className="flex items-center justify-between p-6 border-b border-gray-700">
+                  <h2 className="text-xl font-bold text-white">{title}</h2>
+                  <button
+                    onClick={handleClose}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <X size={24} />
+                  </button>
                 </div>
               )}
 
               {/* Content */}
-              <div className={`overflow-y-auto max-h-[calc(90vh-80px)] ${title ? 'p-6' : 'p-6 pt-12'}`}>
+              <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
                 {children}
               </div>
             </motion.div>

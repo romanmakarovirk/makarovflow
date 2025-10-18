@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "MakarovFlow",
+    "name": "MindFlow",
     "tagline": "Your digital mood journal"
   },
   "nav": {
@@ -114,7 +114,7 @@
     "feedback": "Feedback"
   },
   "premium": {
-    "title": "MakarovFlow Premium",
+    "title": "MindFlow Premium",
     "aiAnalyzer": "AI Analyzer",
     "aiDescription": "Get detailed analysis with predictions and recommendations from AI",
     "studyAI": "Study AI",

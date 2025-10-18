@@ -2,7 +2,7 @@ import { Bot, InlineKeyboard } from 'grammy';
 import http from 'http';
 
 // Bot configuration from environment variables
-const BOT_TOKEN = process.env.BOT_TOKEN || '8353631022:AAHWAts6QguP9--0S4eWxM1rb0Dr40Cmy2Y';
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN || '8353631022:AAHWAts6QguP9--0S4eWxM1rb0Dr40Cmy2Y';
 const WEB_APP_URL = process.env.WEB_APP_URL || 'https://superlative-gelato-2ffbac.netlify.app';
 const PORT = process.env.PORT || 3000;
 

@@ -122,7 +122,7 @@ const HomeworkTab = () => {
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               filter === 'all'
                 ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-750'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-750'
             }`}
           >
             Все ({tasks.length})
@@ -132,7 +132,7 @@ const HomeworkTab = () => {
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               filter === 'pending'
                 ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-750'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-750'
             }`}
           >
             Активные ({pendingCount})
@@ -142,7 +142,7 @@ const HomeworkTab = () => {
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               filter === 'completed'
                 ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-750'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-750'
             }`}
           >
             Готовые ({completedCount})
@@ -251,12 +251,10 @@ const HomeworkTab = () => {
 
       {/* Add button */}
       {filteredTasks.length > 0 && (
-        <div className="flex justify-center">
-          <Button onClick={() => setShowAddModal(true)} variant="primary">
-            <Plus size={20} />
-            Добавить задание
-          </Button>
-        </div>
+        <Button onClick={() => setShowAddModal(true)} variant="primary" fullWidth>
+          <Plus size={20} />
+          Добавить задание
+        </Button>
       )}
 
       {/* Add Homework Modal */}
@@ -316,50 +314,50 @@ const AddHomeworkModal = ({ isOpen, onClose, onSave }) => {
     <Modal isOpen={isOpen} onClose={onClose} title="Добавить задание">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Предмет</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Предмет</label>
           <input
             type="text"
             value={formData.subject}
             onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
             placeholder="Математика"
-            className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Описание</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Описание</label>
           <textarea
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             placeholder="Решить задачи 1-10 на стр. 45"
             rows="3"
-            className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+            className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Срок сдачи</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Срок сдачи</label>
           <input
             type="date"
             value={formData.dueDate}
             onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-            className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Приоритет</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Приоритет</label>
           <div className="grid grid-cols-3 gap-2">
             <button
               type="button"
               onClick={() => setFormData({ ...formData, priority: 'low' })}
               className={`px-4 py-3 rounded-lg font-medium transition-all ${
                 formData.priority === 'low'
-                  ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 border-2 border-green-500'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 border-2 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600'
+                  ? 'bg-green-500/20 text-green-400 border-2 border-green-500'
+                  : 'bg-gray-800 text-gray-400 border-2 border-gray-700 hover:border-gray-600'
               }`}
             >
               Низкий
@@ -369,8 +367,8 @@ const AddHomeworkModal = ({ isOpen, onClose, onSave }) => {
               onClick={() => setFormData({ ...formData, priority: 'medium' })}
               className={`px-4 py-3 rounded-lg font-medium transition-all ${
                 formData.priority === 'medium'
-                  ? 'bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-2 border-yellow-500'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 border-2 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600'
+                  ? 'bg-yellow-500/20 text-yellow-400 border-2 border-yellow-500'
+                  : 'bg-gray-800 text-gray-400 border-2 border-gray-700 hover:border-gray-600'
               }`}
             >
               Средний
@@ -380,8 +378,8 @@ const AddHomeworkModal = ({ isOpen, onClose, onSave }) => {
               onClick={() => setFormData({ ...formData, priority: 'high' })}
               className={`px-4 py-3 rounded-lg font-medium transition-all ${
                 formData.priority === 'high'
-                  ? 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border-2 border-red-500'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 border-2 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600'
+                  ? 'bg-red-500/20 text-red-400 border-2 border-red-500'
+                  : 'bg-gray-800 text-gray-400 border-2 border-gray-700 hover:border-gray-600'
               }`}
             >
               Высокий
