@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Inbox, Calendar, Clock, Star, CheckCircle2, Circle, ChevronRight } from 'lucide-react';
+import { Plus, Inbox, Calendar, Clock, Star, CheckCircle2, Circle, ChevronRight, Send, Bell, X } from 'lucide-react';
 import { tasks } from '../db/database';
 import { haptic } from '../utils/telegram';
 import Card from '../components/ui/Card';
@@ -11,25 +11,31 @@ const Tasks = () => {
   const [todayTasks, setTodayTasks] = useState([]);
   const [upcomingTasks, setUpcomingTasks] = useState([]);
   const [somedayTasks, setSomedayTasks] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [showNewTask, setShowNewTask] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [showReminderPicker, setShowReminderPicker] = useState(false);
+  const [reminderTime, setReminderTime] = useState('');
 
   useEffect(() => {
     loadTasks();
   }, []);
 
   const loadTasks = async () => {
-    const [inbox, today, upcoming, someday] = await Promise.all([
+    const [inbox, today, upcoming, someday, completed] = await Promise.all([
       tasks.getInbox(),
       tasks.getToday(),
       tasks.getUpcoming(),
-      tasks.getSomeday()
+      tasks.getSomeday(),
+      tasks.getCompleted()
     ]);
 
     setInboxTasks(inbox);
     setTodayTasks(today);
     setUpcomingTasks(upcoming);
     setSomedayTasks(someday);
+    setCompletedTasks(completed);
   };
 
   const handleToggleComplete = async (id) => {
@@ -57,6 +63,31 @@ const Tasks = () => {
     haptic.light();
     await tasks.delete(id);
     loadTasks();
+  };
+
+  const handleSetReminder = async (taskId) => {
+    setSelectedTaskId(taskId);
+    setShowReminderPicker(true);
+    haptic.light();
+  };
+
+  const handleSaveReminder = async () => {
+    if (!reminderTime || !selectedTaskId) return;
+
+    const reminderTimestamp = new Date(reminderTime).getTime();
+    await tasks.update(selectedTaskId, { reminder: reminderTimestamp });
+
+    setShowReminderPicker(false);
+    setSelectedTaskId(null);
+    setReminderTime('');
+    loadTasks();
+    haptic.success();
+  };
+
+  const handleRemoveReminder = async (taskId) => {
+    await tasks.update(taskId, { reminder: null });
+    loadTasks();
+    haptic.light();
   };
 
   const lists = [
@@ -91,6 +122,14 @@ const Tasks = () => {
       count: somedayTasks.length,
       color: 'text-gray-400',
       bgColor: 'bg-gray-500/10'
+    },
+    {
+      id: 'completed',
+      name: 'Выполнено',
+      icon: CheckCircle2,
+      count: completedTasks.length,
+      color: 'text-emerald-400',
+      bgColor: 'bg-emerald-500/10'
     }
   ];
 
@@ -100,6 +139,7 @@ const Tasks = () => {
       case 'today': return todayTasks;
       case 'upcoming': return upcomingTasks;
       case 'someday': return somedayTasks;
+      case 'completed': return completedTasks;
       default: return [];
     }
   };
@@ -112,7 +152,7 @@ const Tasks = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="min-h-screen p-4 pb-24"
+      className="min-h-screen p-4 pb-32"
     >
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
@@ -124,6 +164,7 @@ const Tasks = () => {
 
         {/* Lists Grid */}
         <div className="grid grid-cols-2 gap-3">
+          {/* First 4 lists in 2x2 grid */}
           {lists.map((list) => {
             const Icon = list.icon;
             const isActive = activeList === list.id;
@@ -174,12 +215,14 @@ const Tasks = () => {
                 {activeListData.name}
               </h2>
             </div>
-            <button
-              onClick={() => setShowNewTask(true)}
-              className="p-2 hover:bg-gray-700/50 rounded-lg transition-colors"
-            >
-              <Plus size={20} className="text-gray-400" />
-            </button>
+            {activeList !== 'completed' && (
+              <button
+                onClick={() => setShowNewTask(true)}
+                className="p-2 hover:bg-gray-700/50 rounded-lg transition-colors"
+              >
+                <Plus size={20} className="text-gray-400" />
+              </button>
+            )}
           </div>
         )}
 
@@ -191,8 +234,8 @@ const Tasks = () => {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
             >
-              <Card className="p-4 bg-gray-800/40 border-gray-700/50">
-                <div className="flex items-center gap-3">
+              <Card className="p-3 bg-gray-800/40 border-gray-700/50">
+                <div className="flex items-center gap-2">
                   <Circle size={20} className="text-gray-600 flex-shrink-0" />
                   <input
                     type="text"
@@ -205,10 +248,24 @@ const Tasks = () => {
                         setNewTaskTitle('');
                       }
                     }}
+                    onFocus={(e) => {
+                      // Scroll input into view when keyboard appears
+                      setTimeout(() => {
+                        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 300);
+                    }}
                     placeholder="Новая задача"
                     autoFocus
-                    className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500"
+                    className="flex-1 bg-transparent border-none outline-none text-white light:text-gray-900 placeholder-gray-500 light:placeholder-gray-400"
                   />
+                  <motion.button
+                    onClick={handleAddTask}
+                    disabled={!newTaskTitle.trim()}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95 flex-shrink-0"
+                  >
+                    <Send size={16} className="text-white" />
+                  </motion.button>
                 </div>
               </Card>
             </motion.div>
@@ -228,19 +285,37 @@ const Tasks = () => {
               >
                 <Card className="p-4 bg-gray-800/30 border-gray-700/50 hover:bg-gray-800/40 transition-all">
                   <div className="flex items-start gap-3">
-                    <button
+                    <motion.button
                       onClick={() => handleToggleComplete(task.id)}
                       className="flex-shrink-0 mt-0.5"
+                      whileTap={{ scale: 0.9 }}
                     >
-                      {task.completed ? (
-                        <CheckCircle2 size={20} className="text-emerald-500" />
-                      ) : (
-                        <Circle size={20} className="text-gray-600 hover:text-gray-500 transition-colors" />
-                      )}
-                    </button>
+                      <AnimatePresence mode="wait">
+                        {task.completed ? (
+                          <motion.div
+                            key="checked"
+                            initial={{ scale: 0, rotate: -90 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            exit={{ scale: 0, rotate: 90 }}
+                            transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                          >
+                            <CheckCircle2 size={20} className="text-emerald-500" />
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="unchecked"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                          >
+                            <Circle size={20} className="text-gray-600 hover:text-gray-500 transition-colors" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.button>
 
                     <div className="flex-1 min-w-0">
-                      <p className={`text-base ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                      <p className={`text-base ${task.completed ? 'line-through text-gray-500' : 'text-white light:text-gray-900'}`}>
                         {task.title}
                       </p>
                       {task.notes && (
@@ -248,20 +323,47 @@ const Tasks = () => {
                           {task.notes}
                         </p>
                       )}
-                      {task.when && task.when !== 'today' && task.when !== 'someday' && (
-                        <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
-                          <Calendar size={12} />
-                          <span>{new Date(task.when).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}</span>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-3 mt-2">
+                        {task.when && task.when !== 'today' && task.when !== 'someday' && (
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <Calendar size={12} />
+                            <span>{new Date(task.when).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}</span>
+                          </div>
+                        )}
+                        {task.reminder && (
+                          <div className="flex items-center gap-1 text-xs text-cyan-400">
+                            <Bell size={12} />
+                            <span>{new Date(task.reminder).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveReminder(task.id);
+                              }}
+                              className="ml-1 hover:text-red-400 transition-colors"
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    <button
-                      onClick={() => handleDeleteTask(task.id)}
-                      className="flex-shrink-0 text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                    >
-                      <ChevronRight size={18} />
-                    </button>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      {!task.completed && !task.reminder && (
+                        <button
+                          onClick={() => handleSetReminder(task.id)}
+                          className="p-1.5 text-gray-600 hover:text-cyan-400 transition-colors"
+                        >
+                          <Bell size={16} />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDeleteTask(task.id)}
+                        className="p-1.5 text-gray-600 hover:text-red-400 transition-colors"
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
                   </div>
                 </Card>
               </motion.div>
@@ -291,6 +393,67 @@ const Tasks = () => {
           )}
         </div>
       </div>
+
+      {/* Reminder Picker Modal */}
+      <AnimatePresence>
+        {showReminderPicker && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setShowReminderPicker(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm"
+            >
+              <Card className="p-6 bg-gray-800 border-gray-700">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-white">Установить напоминание</h3>
+                  <button
+                    onClick={() => setShowReminderPicker(false)}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">Дата и время</label>
+                    <input
+                      type="datetime-local"
+                      value={reminderTime}
+                      onChange={(e) => setReminderTime(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    />
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowReminderPicker(false)}
+                      className="flex-1 px-4 py-3 bg-gray-700/50 hover:bg-gray-700 border border-gray-600 rounded-xl text-gray-300 font-medium transition-colors"
+                    >
+                      Отмена
+                    </button>
+                    <button
+                      onClick={handleSaveReminder}
+                      disabled={!reminderTime}
+                      className="flex-1 px-4 py-3 bg-gradient-to-br from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 rounded-xl text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Сохранить
+                    </button>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

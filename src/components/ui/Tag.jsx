@@ -11,14 +11,14 @@ const Tag = ({
 }) => {
   const variants = {
     default: selected
-      ? 'bg-blue-500/20 border-blue-500 text-blue-400'
-      : 'bg-gray-800 border-gray-700 text-gray-300 hover:border-gray-600',
+      ? 'bg-blue-100 dark:bg-blue-500/20 border-blue-500 text-blue-700 dark:text-blue-400'
+      : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600',
     success: selected
-      ? 'bg-green-500/20 border-green-500 text-green-400'
-      : 'bg-gray-800 border-gray-700 text-gray-300 hover:border-gray-600',
+      ? 'bg-green-100 dark:bg-green-500/20 border-green-500 text-green-700 dark:text-green-400'
+      : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600',
     warning: selected
-      ? 'bg-orange-500/20 border-orange-500 text-orange-400'
-      : 'bg-gray-800 border-gray-700 text-gray-300 hover:border-gray-600'
+      ? 'bg-orange-100 dark:bg-orange-500/20 border-orange-500 text-orange-700 dark:text-orange-400'
+      : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600'
   };
 
   const handleClick = () => {
