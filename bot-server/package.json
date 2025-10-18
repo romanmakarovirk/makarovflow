@@ -1,0 +1,14 @@
+{
+  "name": "makarovflow-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot for MakarovFlow Mini App",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "grammy": "^1.30.0"
+  }
+}
