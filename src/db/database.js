@@ -18,6 +18,18 @@ db.version(1).stores({
   settings: 'id, language, isPremium, premiumExpiresAt'
 });
 
+// Version 2: Add tasks table (Things 3 style)
+db.version(2).stores({
+  // Keep existing tables
+  journal_entries: '++id, date, mood, moodEmoji, energy, sleepHours, sleepQuality, createdAt, updatedAt',
+  schedule: '++id, subject, dayOfWeek, startTime, endTime, recurring',
+  homework: '++id, subject, dueDate, priority, completed, createdAt, completedAt',
+  settings: 'id, language, isPremium, premiumExpiresAt',
+
+  // New tasks table (Things 3 style)
+  tasks: '++id, title, notes, list, area, project, when, deadline, tags, completed, createdAt, completedAt, updatedAt'
+});
+
 // Helper functions for Journal Entries
 export const journalEntries = {
   // Get all entries
@@ -232,6 +244,154 @@ export const settings = {
     return await db.settings.update(1, {
       isPremium: true,
       premiumExpiresAt: expiresAt
+    });
+  }
+};
+
+// Helper functions for Tasks (Things 3 style)
+export const tasks = {
+  // Get all tasks
+  getAll: async () => {
+    return await db.tasks.orderBy('createdAt').reverse().toArray();
+  },
+
+  // Get inbox tasks (no when, no area, no project)
+  getInbox: async () => {
+    return await db.tasks
+      .filter(task => !task.completed && !task.when && !task.area && !task.project)
+      .toArray();
+  },
+
+  // Get today's tasks
+  getToday: async () => {
+    const today = new Date().toISOString().split('T')[0];
+    return await db.tasks
+      .filter(task => !task.completed && task.when === 'today')
+      .toArray();
+  },
+
+  // Get upcoming tasks
+  getUpcoming: async () => {
+    return await db.tasks
+      .filter(task => !task.completed && task.when && task.when !== 'today' && task.when !== 'someday')
+      .sortBy('when');
+  },
+
+  // Get someday tasks
+  getSomeday: async () => {
+    return await db.tasks
+      .filter(task => !task.completed && task.when === 'someday')
+      .toArray();
+  },
+
+  // Get tasks by area
+  getByArea: async (area) => {
+    return await db.tasks
+      .where('area')
+      .equals(area)
+      .and(task => !task.completed)
+      .toArray();
+  },
+
+  // Get tasks by project
+  getByProject: async (project) => {
+    return await db.tasks
+      .where('project')
+      .equals(project)
+      .and(task => !task.completed)
+      .toArray();
+  },
+
+  // Get completed tasks
+  getCompleted: async () => {
+    return await db.tasks
+      .where('completed')
+      .equals(true)
+      .reverse()
+      .sortBy('completedAt');
+  },
+
+  // Get all areas
+  getAreas: async () => {
+    const allTasks = await db.tasks.toArray();
+    const areas = [...new Set(allTasks.filter(t => t.area).map(t => t.area))];
+    return areas;
+  },
+
+  // Get all projects
+  getProjects: async () => {
+    const allTasks = await db.tasks.toArray();
+    const projects = [...new Set(allTasks.filter(t => t.project).map(t => t.project))];
+    return projects;
+  },
+
+  // Create task
+  create: async (task) => {
+    const now = Date.now();
+    return await db.tasks.add({
+      title: '',
+      notes: '',
+      list: 'inbox', // inbox, today, upcoming, someday
+      area: null,
+      project: null,
+      when: null, // null, 'today', date string, 'someday'
+      deadline: null,
+      tags: [],
+      completed: false,
+      ...task,
+      createdAt: now,
+      updatedAt: now,
+      completedAt: null
+    });
+  },
+
+  // Update task
+  update: async (id, updates) => {
+    return await db.tasks.update(id, {
+      ...updates,
+      updatedAt: Date.now()
+    });
+  },
+
+  // Toggle completion
+  toggleComplete: async (id) => {
+    const task = await db.tasks.get(id);
+    return await db.tasks.update(id, {
+      completed: !task.completed,
+      completedAt: !task.completed ? Date.now() : null,
+      updatedAt: Date.now()
+    });
+  },
+
+  // Delete task
+  delete: async (id) => {
+    return await db.tasks.delete(id);
+  },
+
+  // Move task to today
+  moveToToday: async (id) => {
+    return await db.tasks.update(id, {
+      when: 'today',
+      list: 'today',
+      updatedAt: Date.now()
+    });
+  },
+
+  // Move task to someday
+  moveToSomeday: async (id) => {
+    return await db.tasks.update(id, {
+      when: 'someday',
+      list: 'someday',
+      updatedAt: Date.now()
+    });
+  },
+
+  // Schedule task for specific date
+  scheduleFor: async (id, date) => {
+    return await db.tasks.update(id, {
+      when: date,
+      list: 'upcoming',
+      updatedAt: Date.now()
     });
   }
 };

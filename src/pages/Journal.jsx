@@ -5,6 +5,7 @@ import { Plus, BookOpen } from 'lucide-react';
 import Button from '../components/ui/Button';
 import MultiStepCheckIn from '../components/journal/MultiStepCheckIn';
 import JournalCalendar from '../components/journal/JournalCalendar';
+import AIInsights from '../components/journal/AIInsights';
 import { journalEntries } from '../db/database';
 
 const Journal = () => {
@@ -46,10 +47,10 @@ const Journal = () => {
       exit={{ opacity: 0, y: -20 }}
       className="min-h-screen p-4 pb-24"
     >
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-semibold text-white tracking-tight">
             {t('journal.title')}
           </h1>
           {!showCheckIn && (
@@ -84,15 +85,19 @@ const Journal = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-gradient-to-r from-green-500/20 to-teal-600/20 border border-green-500/30 rounded-xl p-4"
+            className="bg-gray-800/40 border border-gray-700/50 rounded-2xl p-5"
           >
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">{todayEntry.moodEmoji}</span>
+            <div className="flex items-center gap-4">
+              <span className="text-4xl">{todayEntry.moodEmoji}</span>
               <div className="flex-1">
-                <p className="text-sm text-gray-300">Запись на сегодня создана</p>
-                <p className="text-xs text-gray-400">
-                  Настроение: {todayEntry.mood}/10 • Энергия: {todayEntry.energy}% • Сон: {todayEntry.sleepHours}ч
-                </p>
+                <p className="text-sm font-medium text-gray-300 mb-1">Запись на сегодня создана</p>
+                <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <span>Настроение {todayEntry.mood}/10</span>
+                  <span>•</span>
+                  <span>Энергия {todayEntry.energy}%</span>
+                  <span>•</span>
+                  <span>Сон {todayEntry.sleepHours}ч</span>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -103,14 +108,14 @@ const Journal = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-12 text-center"
+            className="bg-gray-800/30 border border-gray-700/30 rounded-3xl p-16 text-center"
           >
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-600/20 flex items-center justify-center">
-                <BookOpen size={40} className="text-blue-400" />
+            <div className="flex flex-col items-center gap-6">
+              <div className="w-16 h-16 rounded-2xl bg-gray-700/50 flex items-center justify-center">
+                <BookOpen size={32} className="text-gray-400" />
               </div>
               <div>
-                <p className="text-gray-400 text-lg font-medium mb-2">
+                <p className="text-gray-300 text-lg font-medium mb-2">
                   {t('journal.noEntries')}
                 </p>
                 <p className="text-gray-500 text-sm">
@@ -141,6 +146,17 @@ const Journal = () => {
           </motion.div>
         )}
 
+        {/* AI Insights */}
+        {!showCheckIn && hasEntries && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.25 }}
+          >
+            <AIInsights latestEntry={todayEntry} />
+          </motion.div>
+        )}
+
         {/* Stats Preview (if has entries) */}
         {!showCheckIn && hasEntries && (
           <motion.div
@@ -151,34 +167,31 @@ const Journal = () => {
           >
             <motion.button
               whileTap={{ scale: 0.95 }}
-              className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl backdrop-saturate-150 rounded-2xl p-4 text-center border border-white/5 shadow-lg hover:shadow-blue-500/20 transition-all active:shadow-blue-500/40"
+              className="bg-gray-800/40 border border-gray-700/50 rounded-2xl p-5 text-center hover:bg-gray-800/60 transition-all"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent rounded-2xl" />
-              <p className="relative text-2xl font-bold text-blue-400 mb-1">
+              <p className="text-2xl font-semibold text-white mb-1">
                 {hasEntries ? '🎉' : '0'}
               </p>
-              <p className="relative text-xs text-gray-400 font-medium">Записей</p>
+              <p className="text-xs text-gray-500 font-medium">Записей</p>
             </motion.button>
 
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={todayEntry ? handleNewEntry : undefined}
-              className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl backdrop-saturate-150 rounded-2xl p-4 text-center border border-white/5 shadow-lg hover:shadow-green-500/20 transition-all active:shadow-green-500/40"
+              className="bg-gray-800/40 border border-gray-700/50 rounded-2xl p-5 text-center hover:bg-gray-800/60 transition-all"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent rounded-2xl" />
-              <p className="relative text-2xl font-bold text-green-400 mb-1">
+              <p className="text-2xl font-semibold text-white mb-1">
                 {todayEntry ? '✅' : '⏳'}
               </p>
-              <p className="relative text-xs text-gray-400 font-medium">Сегодня</p>
+              <p className="text-xs text-gray-500 font-medium">Сегодня</p>
             </motion.button>
 
             <motion.button
               whileTap={{ scale: 0.95 }}
-              className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl backdrop-saturate-150 rounded-2xl p-4 text-center border border-white/5 shadow-lg hover:shadow-purple-500/20 transition-all active:shadow-purple-500/40"
+              className="bg-gray-800/40 border border-gray-700/50 rounded-2xl p-5 text-center hover:bg-gray-800/60 transition-all"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl" />
-              <p className="relative text-2xl font-bold text-purple-400 mb-1">📈</p>
-              <p className="relative text-xs text-gray-400 font-medium">Прогресс</p>
+              <p className="text-2xl font-semibold text-white mb-1">📈</p>
+              <p className="text-xs text-gray-500 font-medium">Прогресс</p>
             </motion.button>
           </motion.div>
         )}

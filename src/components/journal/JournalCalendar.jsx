@@ -40,11 +40,11 @@ const JournalCalendar = ({ onDateSelect }) => {
   };
 
   const getMoodColor = (mood) => {
-    if (mood >= 9) return 'bg-teal-500';
-    if (mood >= 7) return 'bg-green-500';
-    if (mood >= 5) return 'bg-yellow-500';
-    if (mood >= 3) return 'bg-orange-500';
-    return 'bg-red-500';
+    if (mood >= 9) return 'bg-cyan-500';
+    if (mood >= 7) return 'bg-emerald-500';
+    if (mood >= 5) return 'bg-slate-400';
+    if (mood >= 3) return 'bg-amber-500';
+    return 'bg-rose-500';
   };
 
   const handlePrevMonth = () => {
@@ -106,25 +106,25 @@ const JournalCalendar = ({ onDateSelect }) => {
 
   return (
     <>
-      <Card className="p-6">
-        <div className="space-y-4">
+      <Card className="p-6 bg-gray-800/40 border-gray-700/50">
+        <div className="space-y-5">
           {/* Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-2">
             <button
               onClick={handlePrevMonth}
-              className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-700/50 rounded-xl transition-colors"
             >
-              <ChevronLeft size={24} className="text-gray-400" />
+              <ChevronLeft size={20} className="text-gray-400" />
             </button>
 
-            <h3 className="text-lg font-semibold capitalize">{monthName}</h3>
+            <h3 className="text-base font-medium capitalize text-gray-300">{monthName}</h3>
 
             <button
               onClick={handleNextMonth}
               disabled={new Date(currentDate.getFullYear(), currentDate.getMonth() + 1) > today}
-              className="p-2 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="p-2 hover:bg-gray-700/50 rounded-xl transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              <ChevronRight size={24} className="text-gray-400" />
+              <ChevronRight size={20} className="text-gray-400" />
             </button>
           </div>
 
@@ -147,40 +147,40 @@ const JournalCalendar = ({ onDateSelect }) => {
               return (
                 <motion.button
                   key={key}
-                  whileTap={{ scale: isFuture ? 1 : 0.9 }}
+                  whileTap={{ scale: isFuture ? 1 : 0.95 }}
                   onClick={() => !isFuture && handleDayClick(date, entry)}
                   disabled={isFuture}
                   className={`
-                    aspect-square rounded-lg flex flex-col items-center justify-center
+                    aspect-square rounded-xl flex flex-col items-center justify-center
                     relative transition-all duration-200
                     ${isFuture
                       ? 'text-gray-700 cursor-not-allowed'
-                      : 'hover:bg-gray-700 cursor-pointer'
+                      : 'hover:bg-gray-700/40 cursor-pointer'
                     }
-                    ${isToday ? 'ring-2 ring-blue-500' : ''}
+                    ${isToday ? 'ring-1 ring-gray-500' : ''}
                   `}
                 >
                   <span className={`text-sm font-medium ${
-                    entry ? 'text-white' : 'text-gray-400'
+                    entry ? 'text-white' : 'text-gray-500'
                   }`}>
                     {day}
                   </span>
 
                   {entry && (
-                    <div className="flex items-center gap-1 mt-1">
+                    <div className="flex items-center gap-1 mt-1.5">
                       {/* Mood indicator */}
-                      <div className={`w-2 h-2 rounded-full ${getMoodColor(entry.mood)}`} />
+                      <div className={`w-1.5 h-1.5 rounded-full ${getMoodColor(entry.mood)}`} />
                       {/* Sleep indicator */}
                       {entry.sleepQuality && (
-                        <div className={`w-1.5 h-1.5 rounded-full ${
-                          entry.sleepQuality >= 4 ? 'bg-blue-400' : 'bg-gray-600'
+                        <div className={`w-1 h-1 rounded-full ${
+                          entry.sleepQuality >= 4 ? 'bg-cyan-400' : 'bg-gray-600'
                         }`} />
                       )}
                     </div>
                   )}
 
                   {!entry && !isFuture && (
-                    <div className="w-1 h-1 rounded-full bg-gray-700 mt-1" />
+                    <div className="w-1 h-1 rounded-full bg-gray-700/50 mt-1.5" />
                   )}
                 </motion.button>
               );
@@ -188,17 +188,17 @@ const JournalCalendar = ({ onDateSelect }) => {
           </div>
 
           {/* Legend */}
-          <div className="flex items-center gap-4 text-xs text-gray-400 pt-4 border-t border-gray-700">
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-red-500" />
+          <div className="flex items-center gap-4 text-xs text-gray-500 pt-4 border-t border-gray-700/50">
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
               <span>Плохо</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-yellow-500" />
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
               <span>Норм</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-green-500" />
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               <span>Хорошо</span>
             </div>
           </div>
@@ -228,15 +228,15 @@ const JournalCalendar = ({ onDateSelect }) => {
 
             {/* Energy */}
             <div>
-              <p className="text-sm text-gray-400 mb-1">Энергия</p>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
+              <p className="text-sm text-gray-400 mb-2">Энергия</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-600"
+                    className="h-full bg-gray-400"
                     style={{ width: `${selectedEntry.energy}%` }}
                   />
                 </div>
-                <span className="text-sm font-medium">{selectedEntry.energy}%</span>
+                <span className="text-sm font-medium text-gray-300">{selectedEntry.energy}%</span>
               </div>
             </div>
 

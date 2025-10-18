@@ -6,11 +6,11 @@ const MoodSelector = ({ value, onChange }) => {
   const { t } = useTranslation();
 
   const moods = [
-    { emoji: '😢', value: 2, label: t('mood.veryBad'), color: 'from-red-500 to-orange-600' },
-    { emoji: '😟', value: 4, label: t('mood.bad'), color: 'from-orange-500 to-yellow-600' },
-    { emoji: '😐', value: 6, label: t('mood.neutral'), color: 'from-yellow-500 to-green-500' },
-    { emoji: '🙂', value: 8, label: t('mood.good'), color: 'from-green-500 to-teal-500' },
-    { emoji: '😊', value: 10, label: t('mood.veryGood'), color: 'from-teal-500 to-blue-500' }
+    { emoji: '😢', value: 2, label: t('mood.veryBad'), color: 'bg-rose-500/20 border-rose-500/40' },
+    { emoji: '😟', value: 4, label: t('mood.bad'), color: 'bg-amber-500/20 border-amber-500/40' },
+    { emoji: '😐', value: 6, label: t('mood.neutral'), color: 'bg-slate-500/20 border-slate-500/40' },
+    { emoji: '🙂', value: 8, label: t('mood.good'), color: 'bg-emerald-500/20 border-emerald-500/40' },
+    { emoji: '😊', value: 10, label: t('mood.veryGood'), color: 'bg-cyan-500/20 border-cyan-500/40' }
   ];
 
   const handleMoodClick = (moodValue, emoji) => {
@@ -19,11 +19,11 @@ const MoodSelector = ({ value, onChange }) => {
   };
 
   return (
-    <div className="space-y-3">
-      <label className="block text-sm font-medium text-gray-300">
+    <div className="space-y-4">
+      <label className="block text-sm font-medium text-gray-400">
         {t('journal.howAreYou')}
       </label>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-3">
         {moods.map((mood) => {
           const isSelected = value?.value === mood.value;
 
@@ -35,25 +35,18 @@ const MoodSelector = ({ value, onChange }) => {
               onClick={() => handleMoodClick(mood.value, mood.emoji)}
               className={`
                 flex-1 aspect-square rounded-2xl flex flex-col items-center justify-center
-                transition-all duration-300 relative overflow-hidden
+                transition-all duration-200 border
                 ${isSelected
-                  ? `bg-gradient-to-br ${mood.color} shadow-lg scale-110`
-                  : 'bg-gray-800 hover:bg-gray-750'
+                  ? mood.color
+                  : 'bg-gray-800/40 border-gray-700/50 hover:bg-gray-800/60'
                 }
               `}
             >
-              {isSelected && (
-                <motion.div
-                  layoutId="selectedMood"
-                  className="absolute inset-0 bg-white/10"
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                />
-              )}
-              <span className={`text-3xl relative z-10 ${isSelected ? 'scale-110' : ''}`}>
+              <span className={`text-3xl transition-transform ${isSelected ? 'scale-110' : ''}`}>
                 {mood.emoji}
               </span>
-              <span className={`text-xs mt-1 font-medium relative z-10 ${
-                isSelected ? 'text-white' : 'text-gray-400'
+              <span className={`text-xs mt-2 font-medium ${
+                isSelected ? 'text-white' : 'text-gray-500'
               }`}>
                 {mood.label.split(' ')[0]}
               </span>

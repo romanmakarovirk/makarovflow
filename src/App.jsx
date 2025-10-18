@@ -4,6 +4,7 @@ import { useStore } from './store/useStore';
 
 // Pages
 import Journal from './pages/Journal';
+import Tasks from './pages/Tasks';
 import Insights from './pages/Insights';
 import Study from './pages/Study';
 import Settings from './pages/Settings';
@@ -37,6 +38,8 @@ function App() {
     switch (currentPage) {
       case 'journal':
         return <Journal />;
+      case 'tasks':
+        return <Tasks />;
       case 'insights':
         return <Insights />;
       case 'study':
