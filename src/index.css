@@ -35,12 +35,6 @@ body {
   min-height: 100vh;
 }
 
-/* Light mode */
-html.light body {
-  background-color: #f3f4f6;
-  color: #111827;
-}
-
 /* Custom scrollbar for dark theme */
 ::-webkit-scrollbar {
   width: 8px;
@@ -51,28 +45,16 @@ html.light body {
   background: #1f2937;
 }
 
-html.light ::-webkit-scrollbar-track {
-  background: #e5e7eb;
-}
-
 ::-webkit-scrollbar-thumb {
   background: #4b5563;
   border-radius: 4px;
-}
-
-html.light ::-webkit-scrollbar-thumb {
-  background: #9ca3af;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
 }
 
-html.light ::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
-}
-
 /* Smooth transitions */
 * {
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }

@@ -80,8 +80,6 @@ export const generateInsights = async (entries) => {
     const avgMood = entries.reduce((sum, e) => sum + e.mood, 0) / entries.length;
     const avgEnergy = entries.reduce((sum, e) => sum + (e.energy || 50), 0) / entries.length;
     const avgSleep = entries.reduce((sum, e) => sum + (e.sleepHours || 7), 0) / entries.length;
-    const avgWorkoutMinutes = entries.reduce((sum, e) => sum + (e.workoutMinutes || 0), 0) / entries.length;
-    const avgWorkoutCalories = entries.reduce((sum, e) => sum + (e.workoutCalories || 0), 0) / entries.length;
 
     // Find patterns
     const insights = [];
@@ -123,47 +121,6 @@ export const generateInsights = async (entries) => {
         icon: '✨',
         text: 'Отличный режим сна! Это положительно влияет на настроение и энергию.'
       });
-    }
-
-    // Workout insights
-    if (avgWorkoutMinutes >= 30) {
-      insights.push({
-        type: 'positive',
-        icon: '💪',
-        text: `Отличная физическая активность! В среднем ${avgWorkoutMinutes.toFixed(0)} минут тренировок в день.`
-      });
-    } else if (avgWorkoutMinutes > 0 && avgWorkoutMinutes < 30) {
-      insights.push({
-        type: 'suggestion',
-        icon: '🏃',
-        text: `Хорошее начало! Попробуй увеличить тренировки до 30-60 минут в день.`
-      });
-    } else {
-      const activeDays = entries.filter(e => e.workoutMinutes > 0).length;
-      if (activeDays === 0) {
-        insights.push({
-          type: 'suggestion',
-          icon: '🚶',
-          text: 'Добавь физическую активность в свой день - даже 15 минут прогулки помогут!'
-        });
-      }
-    }
-
-    // Correlation between workouts and mood
-    const workoutDays = entries.filter(e => e.workoutMinutes >= 20);
-    const noWorkoutDays = entries.filter(e => !e.workoutMinutes || e.workoutMinutes < 20);
-
-    if (workoutDays.length > 2 && noWorkoutDays.length > 2) {
-      const avgMoodWorkout = workoutDays.reduce((sum, e) => sum + e.mood, 0) / workoutDays.length;
-      const avgMoodNoWorkout = noWorkoutDays.reduce((sum, e) => sum + e.mood, 0) / noWorkoutDays.length;
-
-      if (avgMoodWorkout - avgMoodNoWorkout > 1) {
-        insights.push({
-          type: 'insight',
-          icon: '🔍',
-          text: `После тренировок твоё настроение в среднем на ${(avgMoodWorkout - avgMoodNoWorkout).toFixed(1)} балла выше!`
-        });
-      }
     }
 
     // Correlation between sleep and mood
