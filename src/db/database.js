@@ -1,7 +1,7 @@
 import Dexie from 'dexie';
 
 // Initialize Dexie database
-export const db = new Dexie('MindFlowDB');
+export const db = new Dexie('MakarovFlowDB');
 
 // Define database schema
 db.version(1).stores({
@@ -28,6 +28,35 @@ db.version(2).stores({
 
   // New tasks table (Things 3 style)
   tasks: '++id, title, notes, list, area, project, when, deadline, tags, completed, createdAt, completedAt, updatedAt'
+});
+
+// Version 3: Add workout fields to journal_entries
+db.version(3).stores({
+  journal_entries: '++id, date, mood, moodEmoji, energy, sleepHours, sleepQuality, workoutMinutes, workoutCalories, createdAt, updatedAt',
+  schedule: '++id, subject, dayOfWeek, startTime, endTime, recurring',
+  homework: '++id, subject, dueDate, priority, completed, createdAt, completedAt',
+  settings: 'id, language, isPremium, premiumExpiresAt',
+  tasks: '++id, title, notes, list, area, project, when, deadline, tags, completed, createdAt, completedAt, updatedAt'
+});
+
+// Version 4: Add AI chat messages table
+db.version(4).stores({
+  journal_entries: '++id, date, mood, moodEmoji, energy, sleepHours, sleepQuality, workoutMinutes, workoutCalories, createdAt, updatedAt',
+  schedule: '++id, subject, dayOfWeek, startTime, endTime, recurring',
+  homework: '++id, subject, dueDate, priority, completed, createdAt, completedAt',
+  settings: 'id, language, isPremium, premiumExpiresAt',
+  tasks: '++id, title, notes, list, area, project, when, deadline, tags, completed, createdAt, completedAt, updatedAt',
+  ai_messages: '++id, role, content, createdAt'
+});
+
+// Version 5: Add reminder field to tasks table
+db.version(5).stores({
+  journal_entries: '++id, date, mood, moodEmoji, energy, sleepHours, sleepQuality, workoutMinutes, workoutCalories, createdAt, updatedAt',
+  schedule: '++id, subject, dayOfWeek, startTime, endTime, recurring',
+  homework: '++id, subject, dueDate, priority, completed, createdAt, completedAt',
+  settings: 'id, language, isPremium, premiumExpiresAt',
+  tasks: '++id, title, notes, list, area, project, when, deadline, tags, completed, reminder, createdAt, completedAt, updatedAt',
+  ai_messages: '++id, role, content, createdAt'
 });
 
 // Helper functions for Journal Entries
@@ -194,6 +223,7 @@ export const settings = {
       const defaultSettings = {
         id: 1,
         language: 'ru',
+        theme: 'dark',
         notifications: {
           dailyReminder: true,
           homeworkReminders: true,
@@ -218,6 +248,11 @@ export const settings = {
   // Update language
   setLanguage: async (language) => {
     return await db.settings.update(1, { language });
+  },
+
+  // Update theme
+  setTheme: async (theme) => {
+    return await db.settings.update(1, { theme });
   },
 
   // Update notifications
@@ -245,6 +280,39 @@ export const settings = {
       isPremium: true,
       premiumExpiresAt: expiresAt
     });
+  },
+
+  // Get AI usage (free: 3/day, premium: 15/day)
+  getAIUsage: async () => {
+    const setting = await settings.get();
+    const today = new Date().toISOString().split('T')[0];
+
+    if (!setting.aiUsage || setting.aiUsage.date !== today) {
+      return { count: 0, date: today, limit: setting.isPremium ? 15 : 3 };
+    }
+
+    return {
+      count: setting.aiUsage.count,
+      date: today,
+      limit: setting.isPremium ? 15 : 3
+    };
+  },
+
+  // Increment AI usage
+  incrementAIUsage: async () => {
+    const setting = await settings.get();
+    const today = new Date().toISOString().split('T')[0];
+
+    let newCount = 1;
+    if (setting.aiUsage && setting.aiUsage.date === today) {
+      newCount = setting.aiUsage.count + 1;
+    }
+
+    await db.settings.update(1, {
+      aiUsage: { count: newCount, date: today }
+    });
+
+    return newCount;
   }
 };
 
@@ -338,6 +406,7 @@ export const tasks = {
       deadline: null,
       tags: [],
       completed: false,
+      reminder: null, // timestamp when to send reminder
       ...task,
       createdAt: now,
       updatedAt: now,
@@ -393,6 +462,42 @@ export const tasks = {
       list: 'upcoming',
       updatedAt: Date.now()
     });
+  }
+};
+
+// Helper functions for AI Messages
+export const aiMessages = {
+  // Get all messages
+  getAll: async () => {
+    return await db.ai_messages.orderBy('createdAt').toArray();
+  },
+
+  // Get recent messages (last N)
+  getRecent: async (n = 50) => {
+    return await db.ai_messages
+      .orderBy('createdAt')
+      .reverse()
+      .limit(n)
+      .toArray();
+  },
+
+  // Add message
+  add: async (role, content) => {
+    return await db.ai_messages.add({
+      role, // 'user' or 'assistant'
+      content,
+      createdAt: Date.now()
+    });
+  },
+
+  // Clear all messages
+  clear: async () => {
+    return await db.ai_messages.clear();
+  },
+
+  // Delete message
+  delete: async (id) => {
+    return await db.ai_messages.delete(id);
   }
 };
 

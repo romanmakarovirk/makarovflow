@@ -5,6 +5,7 @@ import { useStore } from './store/useStore';
 // Pages
 import Journal from './pages/Journal';
 import Tasks from './pages/Tasks';
+import AIChat from './pages/AIChat';
 import Insights from './pages/Insights';
 import Study from './pages/Study';
 import Settings from './pages/Settings';
@@ -40,6 +41,8 @@ function App() {
         return <Journal />;
       case 'tasks':
         return <Tasks />;
+      case 'ai-chat':
+        return <AIChat />;
       case 'insights':
         return <Insights />;
       case 'study':
@@ -52,7 +55,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white pb-20">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white pb-20">
       {renderPage()}
       <Navigation />
       {toast && <Toast message={toast.message} type={toast.type} />}

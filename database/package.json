@@ -1,0 +1,11 @@
+{
+  "name": "mindflow-database-setup",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "setup": "node setup.js"
+  },
+  "dependencies": {
+    "pg": "^8.11.3"
+  }
+}

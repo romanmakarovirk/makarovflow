@@ -18,17 +18,20 @@ const MultiStepCheckIn = ({ existingEntry, onSave, onCancel }) => {
     energy: existingEntry?.energy || 75,
     sleepHours: existingEntry?.sleepHours || 7,
     sleepQuality: existingEntry?.sleepQuality || 3,
+    workoutMinutes: existingEntry?.workoutMinutes || 0,
+    workoutCalories: existingEntry?.workoutCalories || 0,
     tags: existingEntry?.tags || [],
     note: existingEntry?.note || ''
   });
 
-  const totalSteps = 4;
+  const totalSteps = 5;
 
   const steps = [
     { id: 1, title: 'Как настроение?', icon: '😊' },
     { id: 2, title: 'Как спалось?', icon: '😴' },
-    { id: 3, title: 'Чем занимался?', icon: '🎯' },
-    { id: 4, title: 'Заметки', icon: '📝' }
+    { id: 3, title: 'Тренировки', icon: '💪' },
+    { id: 4, title: 'Чем занимался?', icon: '🎯' },
+    { id: 5, title: 'Заметки', icon: '📝' }
   ];
 
   const handleNext = () => {
@@ -63,6 +66,8 @@ const MultiStepCheckIn = ({ existingEntry, onSave, onCancel }) => {
         energy: formData.energy,
         sleepHours: formData.sleepHours,
         sleepQuality: formData.sleepQuality,
+        workoutMinutes: formData.workoutMinutes,
+        workoutCalories: formData.workoutCalories,
         tags: formData.tags,
         note: formData.note
       };
@@ -171,11 +176,73 @@ const MultiStepCheckIn = ({ existingEntry, onSave, onCancel }) => {
               </div>
             )}
 
-            {/* Step 3: Tags */}
+            {/* Step 3: Workout */}
             {step === 3 && (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
                   {steps[2].title}
+                </h2>
+                <div className="space-y-4">
+                  <div className="bg-gray-900/50 rounded-2xl p-4 border border-gray-700">
+                    <label className="block text-sm font-medium text-gray-400 mb-3">
+                      Продолжительность: {formData.workoutMinutes} мин
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="180"
+                      step="5"
+                      value={formData.workoutMinutes}
+                      onChange={(e) => setFormData({ ...formData, workoutMinutes: parseInt(e.target.value) })}
+                      className="w-full accent-purple-500"
+                    />
+                    <div className="flex justify-between text-xs text-gray-600 mt-1">
+                      <span>0</span>
+                      <span>180 мин</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-900/50 rounded-2xl p-4 border border-gray-700">
+                    <label className="block text-sm font-medium text-gray-400 mb-3">
+                      Калории: {formData.workoutCalories} ккал
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1000"
+                      step="10"
+                      value={formData.workoutCalories}
+                      onChange={(e) => setFormData({ ...formData, workoutCalories: parseInt(e.target.value) })}
+                      className="w-full accent-purple-500"
+                    />
+                    <div className="flex justify-between text-xs text-gray-600 mt-1">
+                      <span>0</span>
+                      <span>1000 ккал</span>
+                    </div>
+                  </div>
+
+                  {formData.workoutMinutes === 0 && formData.workoutCalories === 0 && (
+                    <p className="text-center text-sm text-gray-500">
+                      Не было тренировок? Это нормально! Переходи к следующему шагу.
+                    </p>
+                  )}
+
+                  {(formData.workoutMinutes > 0 || formData.workoutCalories > 0) && (
+                    <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-2xl p-4 border border-purple-500/20">
+                      <p className="text-center text-sm text-purple-300">
+                        💪 {formData.workoutMinutes > 60 ? 'Отличная тренировка!' : formData.workoutMinutes > 30 ? 'Хорошая работа!' : formData.workoutMinutes > 0 ? 'Молодец!' : 'Продолжай в том же духе!'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Tags */}
+            {step === 4 && (
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+                  {steps[3].title}
                 </h2>
                 <TagsSelector
                   selectedTags={formData.tags}
@@ -184,11 +251,11 @@ const MultiStepCheckIn = ({ existingEntry, onSave, onCancel }) => {
               </div>
             )}
 
-            {/* Step 4: Note */}
-            {step === 4 && (
+            {/* Step 5: Note */}
+            {step === 5 && (
               <div className="space-y-4">
                 <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-                  {steps[3].title}
+                  {steps[4].title}
                 </h2>
                 <textarea
                   value={formData.note}

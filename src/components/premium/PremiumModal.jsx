@@ -48,35 +48,26 @@ const PremiumModal = ({ isOpen, onClose }) => {
 
   const handlePayment = async () => {
     try {
+      haptic.medium();
+
       if (selectedMethod === 'stars') {
         // Telegram Stars payment
-        haptic.medium();
+        // Для работы Stars payment нужно:
+        // 1. Настроить payment провайдера в @BotFather
+        // 2. Создать invoice link через бота
+        // 3. Открыть через webApp.openInvoice()
 
-        // Создаём invoice для Telegram Stars
-        const invoice = {
-          title: 'MakarovFlow Premium',
-          description: 'Месячная подписка на Premium функции',
-          payload: 'premium_monthly',
-          provider_token: '', // Пустой для Stars
-          currency: 'XTR', // Telegram Stars
-          prices: [{ label: 'Premium подписка', amount: 99 }] // 99 Stars
-        };
+        showToast('Для настройки оплаты Stars свяжитесь с @BotFather и настройте Telegram Payments', 'info');
 
-        // Открываем инвойс через Telegram WebApp API
-        if (webApp.openInvoice) {
-          webApp.openInvoice(invoice.url, (status) => {
-            if (status === 'paid') {
-              showToast('Premium активирован! 🎉', 'success');
-              onClose();
-            } else if (status === 'cancelled') {
-              showToast('Оплата отменена', 'warning');
-            } else {
-              showToast('Ошибка оплаты', 'error');
-            }
-          });
-        } else {
-          showToast('Функция оплаты недоступна', 'warning');
-        }
+        // Пример правильного использования (требует настройки бота):
+        // const invoiceLink = await fetch('/api/create-invoice').then(r => r.json());
+        // webApp.openInvoice(invoiceLink, (status) => {
+        //   if (status === 'paid') {
+        //     showToast('Premium активирован! 🎉', 'success');
+        //     onClose();
+        //   }
+        // });
+
       } else if (selectedMethod === 'card' || selectedMethod === 'sbp') {
         // Пока заглушка для карт и СБП
         showToast('Скоро будет доступно', 'info');

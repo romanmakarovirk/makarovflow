@@ -10,13 +10,13 @@ const Card = ({
 }) => {
   const baseStyles = 'rounded-3xl shadow-2xl';
 
-  // Liquid Glass effect (iOS 18 style)
+  // Liquid Glass effect - proper light and dark theme support
   const cardStyles = glassmorphism
-    ? 'bg-gradient-to-br from-gray-800/70 via-gray-800/60 to-gray-900/70 backdrop-blur-2xl backdrop-saturate-150 border border-white/10'
-    : 'bg-gray-800/50 backdrop-blur-sm border border-gray-700';
+    ? 'bg-white/90 dark:bg-gradient-to-br dark:from-gray-800/70 dark:via-gray-800/60 dark:to-gray-900/70 backdrop-blur-2xl backdrop-saturate-150 border border-gray-200/60 dark:border-white/10 shadow-gray-200/50 dark:shadow-none'
+    : 'bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700';
 
   const interactiveStyles = hoverable || onClick
-    ? 'cursor-pointer hover:scale-[1.01] hover:shadow-3xl active:scale-[0.99] transition-all duration-300 ease-out'
+    ? 'cursor-pointer hover:scale-[1.01] hover:shadow-xl active:scale-[0.99] transition-all duration-300 ease-out'
     : '';
 
   const CardWrapper = onClick ? motion.div : 'div';
