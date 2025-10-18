@@ -65,9 +65,9 @@ const Insights = () => {
             {t('insights.title')}
           </h1>
 
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-12 text-center">
+          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl p-12 text-center border border-white/5">
             <div className="flex flex-col items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-500/20 to-teal-600/20 flex items-center justify-center">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-500/20 to-teal-600/20 flex items-center justify-center shadow-lg">
                 <BarChart3 size={40} className="text-green-400" />
               </div>
               <div>
@@ -163,27 +163,31 @@ const Insights = () => {
           transition={{ delay: 0.5 }}
           className="grid grid-cols-2 sm:grid-cols-4 gap-4"
         >
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 text-center">
-            <p className="text-3xl font-bold text-blue-400">{entries.length}</p>
-            <p className="text-sm text-gray-400 mt-1">Всего записей</p>
+          <div className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl rounded-xl p-4 text-center border border-white/5 shadow-lg hover:shadow-blue-500/20 transition-all">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent rounded-xl" />
+            <p className="relative text-3xl font-bold text-blue-400">{entries.length}</p>
+            <p className="relative text-sm text-gray-400 mt-1">Всего записей</p>
           </div>
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 text-center">
-            <p className="text-3xl font-bold text-green-400">
+          <div className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl rounded-xl p-4 text-center border border-white/5 shadow-lg hover:shadow-green-500/20 transition-all">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent rounded-xl" />
+            <p className="relative text-3xl font-bold text-green-400">
               {Math.round((summary?.goodDays / summary?.totalDays) * 100) || 0}%
             </p>
-            <p className="text-sm text-gray-400 mt-1">Хороших дней</p>
+            <p className="relative text-sm text-gray-400 mt-1">Хороших дней</p>
           </div>
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 text-center">
-            <p className="text-3xl font-bold text-purple-400">
+          <div className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl rounded-xl p-4 text-center border border-white/5 shadow-lg hover:shadow-purple-500/20 transition-all">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-xl" />
+            <p className="relative text-3xl font-bold text-purple-400">
               {summary?.avgMood.toFixed(1) || 0}
             </p>
-            <p className="text-sm text-gray-400 mt-1">Средн. настроение</p>
+            <p className="relative text-sm text-gray-400 mt-1">Средн. настроение</p>
           </div>
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 text-center">
-            <p className="text-3xl font-bold text-orange-400">
+          <div className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl rounded-xl p-4 text-center border border-white/5 shadow-lg hover:shadow-orange-500/20 transition-all">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent rounded-xl" />
+            <p className="relative text-3xl font-bold text-orange-400">
               {summary?.avgSleep.toFixed(1) || 0}ч
             </p>
-            <p className="text-sm text-gray-400 mt-1">Средн. сон</p>
+            <p className="relative text-sm text-gray-400 mt-1">Средн. сон</p>
           </div>
         </motion.div>
       </div>

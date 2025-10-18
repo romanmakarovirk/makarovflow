@@ -5,8 +5,7 @@ import { useStore } from './store/useStore';
 // Pages
 import Journal from './pages/Journal';
 import Tasks from './pages/Tasks';
-import Insights from './pages/Insights';
-import Study from './pages/Study';
+import AIAssistant from './pages/AIAssistant';
 import Settings from './pages/Settings';
 
 // Components
@@ -40,10 +39,8 @@ function App() {
         return <Journal />;
       case 'tasks':
         return <Tasks />;
-      case 'insights':
-        return <Insights />;
-      case 'study':
-        return <Study />;
+      case 'ai':
+        return <AIAssistant />;
       case 'settings':
         return <Settings />;
       default:

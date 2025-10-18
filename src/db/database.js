@@ -30,6 +30,21 @@ db.version(2).stores({
   tasks: '++id, title, notes, list, area, project, when, deadline, tags, completed, createdAt, completedAt, updatedAt'
 });
 
+// Version 3: Add AI messages and user stats
+db.version(3).stores({
+  journal_entries: '++id, date, mood, moodEmoji, energy, sleepHours, sleepQuality, createdAt, updatedAt',
+  schedule: '++id, subject, dayOfWeek, startTime, endTime, recurring',
+  homework: '++id, subject, dueDate, priority, completed, createdAt, completedAt',
+  settings: 'id, language, isPremium, premiumExpiresAt',
+  tasks: '++id, title, notes, list, area, project, when, deadline, tags, completed, reminder, createdAt, completedAt, updatedAt',
+
+  // AI messages and insights
+  ai_messages: '++id, role, content, createdAt',
+
+  // User stats and memories
+  user_stats: 'id, totalEntries, currentStreak, longestStreak, lastEntryDate, totalTasks, completedTasks'
+});
+
 // Helper functions for Journal Entries
 export const journalEntries = {
   // Get all entries
@@ -245,6 +260,45 @@ export const settings = {
       isPremium: true,
       premiumExpiresAt: expiresAt
     });
+  },
+
+  // AI Usage tracking
+  getAIUsage: async () => {
+    const setting = await settings.get();
+    const today = new Date().toISOString().split('T')[0];
+
+    if (!setting.aiUsage) {
+      const aiUsage = {
+        date: today,
+        count: 0,
+        limit: 10 // Free users get 10 requests per day
+      };
+      await db.settings.update(1, { aiUsage });
+      return aiUsage;
+    }
+
+    // Reset count if it's a new day
+    if (setting.aiUsage.date !== today) {
+      const aiUsage = {
+        date: today,
+        count: 0,
+        limit: setting.isPremium ? 50 : 10
+      };
+      await db.settings.update(1, { aiUsage });
+      return aiUsage;
+    }
+
+    return setting.aiUsage;
+  },
+
+  incrementAIUsage: async () => {
+    const usage = await settings.getAIUsage();
+    const newUsage = {
+      ...usage,
+      count: usage.count + 1
+    };
+    await db.settings.update(1, { aiUsage: newUsage });
+    return newUsage;
   }
 };
 
@@ -451,6 +505,8 @@ export const clearAllData = async () => {
   await db.journal_entries.clear();
   await db.schedule.clear();
   await db.homework.clear();
+  await db.tasks.clear();
+  await db.ai_messages.clear();
   await db.settings.update(1, {
     language: 'ru',
     notifications: {
@@ -461,6 +517,104 @@ export const clearAllData = async () => {
     isPremium: false,
     premiumExpiresAt: null
   });
+};
+
+// Helper functions for AI Messages
+export const aiMessages = {
+  // Get all messages
+  getAll: async () => {
+    return await db.ai_messages.orderBy('createdAt').toArray();
+  },
+
+  // Get recent N messages
+  getRecent: async (n = 20) => {
+    return await db.ai_messages.orderBy('createdAt').reverse().limit(n).toArray();
+  },
+
+  // Add message
+  add: async (role, content) => {
+    return await db.ai_messages.add({
+      role, // 'user' or 'assistant'
+      content,
+      createdAt: Date.now()
+    });
+  },
+
+  // Clear all messages
+  clear: async () => {
+    return await db.ai_messages.clear();
+  }
+};
+
+// Helper functions for User Stats
+export const userStats = {
+  // Get stats
+  get: async () => {
+    let stats = await db.user_stats.get(1);
+
+    if (!stats) {
+      const defaultStats = {
+        id: 1,
+        totalEntries: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        lastEntryDate: null,
+        totalTasks: 0,
+        completedTasks: 0
+      };
+      await db.user_stats.add(defaultStats);
+      stats = defaultStats;
+    }
+
+    return stats;
+  },
+
+  // Update entry stats
+  updateEntryStats: async () => {
+    const stats = await userStats.get();
+    const entries = await journalEntries.getAll();
+    const today = new Date().toISOString().split('T')[0];
+
+    let currentStreak = 0;
+    let longestStreak = 0;
+    let streak = 0;
+
+    // Calculate streaks
+    const sortedEntries = entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    for (let i = 0; i < sortedEntries.length; i++) {
+      const entryDate = new Date(sortedEntries[i].date);
+      const expectedDate = new Date(today);
+      expectedDate.setDate(expectedDate.getDate() - i);
+
+      if (entryDate.toISOString().split('T')[0] === expectedDate.toISOString().split('T')[0]) {
+        streak++;
+        if (i === 0) currentStreak = streak;
+        longestStreak = Math.max(longestStreak, streak);
+      } else {
+        if (i === 0) currentStreak = 0;
+        streak = 0;
+      }
+    }
+
+    return await db.user_stats.update(1, {
+      totalEntries: entries.length,
+      currentStreak,
+      longestStreak: Math.max(stats.longestStreak, longestStreak),
+      lastEntryDate: today
+    });
+  },
+
+  // Update task stats
+  updateTaskStats: async () => {
+    const allTasks = await tasks.getAll();
+    const completed = allTasks.filter(t => t.completed).length;
+
+    return await db.user_stats.update(1, {
+      totalTasks: allTasks.length,
+      completedTasks: completed
+    });
+  }
 };
 
 export default db;

@@ -43,7 +43,7 @@ git push origin main
 
    JWT_SECRET = mindflow-super-secret-jwt-key-2024-production-v1
 
-   TELEGRAM_BOT_TOKEN = (получи от @BotFather)
+   TELEGRAM_BOT_TOKEN = 8353631022:AAHWAts6QguP9--0S4eWxM1rb0Dr40Cmy2Y
    \`\`\`
 
 7. Нажми **"Create Web Service"**
@@ -68,7 +68,7 @@ git push origin main
 
 4. **Environment Variables**:
    \`\`\`
-   TELEGRAM_BOT_TOKEN = (твой токен от @BotFather)
+   TELEGRAM_BOT_TOKEN = 8353631022:AAHWAts6QguP9--0S4eWxM1rb0Dr40Cmy2Y
 
    API_URL = https://mindflow-api.onrender.com
 

@@ -1,40 +1,44 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Inbox, Calendar, Clock, Star, CheckCircle2, Circle, ChevronRight } from 'lucide-react';
-import { tasks } from '../db/database';
+import { Plus, Inbox, Calendar, Star, Archive, Circle, CheckCircle2, ChevronRight, Bell, X } from 'lucide-react';
+import { tasks, userStats } from '../db/database';
 import { haptic } from '../utils/telegram';
 import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
 
 const Tasks = () => {
   const [activeList, setActiveList] = useState('inbox');
   const [inboxTasks, setInboxTasks] = useState([]);
   const [todayTasks, setTodayTasks] = useState([]);
   const [upcomingTasks, setUpcomingTasks] = useState([]);
-  const [somedayTasks, setSomedayTasks] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [showNewTask, setShowNewTask] = useState(false);
+  const [showReminder, setShowReminder] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   useEffect(() => {
     loadTasks();
   }, []);
 
   const loadTasks = async () => {
-    const [inbox, today, upcoming, someday] = await Promise.all([
+    const [inbox, today, upcoming, completed] = await Promise.all([
       tasks.getInbox(),
       tasks.getToday(),
       tasks.getUpcoming(),
-      tasks.getSomeday()
+      tasks.getCompleted()
     ]);
 
     setInboxTasks(inbox);
     setTodayTasks(today);
     setUpcomingTasks(upcoming);
-    setSomedayTasks(someday);
+    setCompletedTasks(completed);
   };
 
   const handleToggleComplete = async (id) => {
-    haptic.light();
+    haptic.success();
     await tasks.toggleComplete(id);
+    await userStats.updateTaskStats();
     loadTasks();
   };
 
@@ -45,17 +49,25 @@ const Tasks = () => {
     await tasks.create({
       title: newTaskTitle,
       list: activeList,
-      when: activeList === 'today' ? 'today' : activeList === 'someday' ? 'someday' : null
+      when: activeList === 'today' ? 'today' : activeList === 'upcoming' ? new Date().toISOString().split('T')[0] : null
     });
 
     setNewTaskTitle('');
     setShowNewTask(false);
+    await userStats.updateTaskStats();
     loadTasks();
   };
 
   const handleDeleteTask = async (id) => {
     haptic.light();
     await tasks.delete(id);
+    await userStats.updateTaskStats();
+    loadTasks();
+  };
+
+  const handleMoveToToday = async (id) => {
+    haptic.light();
+    await tasks.moveToToday(id);
     loadTasks();
   };
 
@@ -66,7 +78,8 @@ const Tasks = () => {
       icon: Inbox,
       count: inboxTasks.length,
       color: 'text-blue-400',
-      bgColor: 'bg-blue-500/10'
+      gradient: 'from-blue-500/20 to-blue-600/20',
+      borderColor: 'border-blue-500/30'
     },
     {
       id: 'today',
@@ -74,7 +87,8 @@ const Tasks = () => {
       icon: Star,
       count: todayTasks.length,
       color: 'text-amber-400',
-      bgColor: 'bg-amber-500/10'
+      gradient: 'from-amber-500/20 to-amber-600/20',
+      borderColor: 'border-amber-500/30'
     },
     {
       id: 'upcoming',
@@ -82,15 +96,17 @@ const Tasks = () => {
       icon: Calendar,
       count: upcomingTasks.length,
       color: 'text-cyan-400',
-      bgColor: 'bg-cyan-500/10'
+      gradient: 'from-cyan-500/20 to-cyan-600/20',
+      borderColor: 'border-cyan-500/30'
     },
     {
-      id: 'someday',
-      name: 'Когда-нибудь',
-      icon: Clock,
-      count: somedayTasks.length,
-      color: 'text-gray-400',
-      bgColor: 'bg-gray-500/10'
+      id: 'completed',
+      name: 'Архив',
+      icon: Archive,
+      count: completedTasks.length,
+      color: 'text-emerald-400',
+      gradient: 'from-emerald-500/20 to-emerald-600/20',
+      borderColor: 'border-emerald-500/30'
     }
   ];
 
@@ -99,7 +115,7 @@ const Tasks = () => {
       case 'inbox': return inboxTasks;
       case 'today': return todayTasks;
       case 'upcoming': return upcomingTasks;
-      case 'someday': return somedayTasks;
+      case 'completed': return completedTasks;
       default: return [];
     }
   };
@@ -117,7 +133,7 @@ const Tasks = () => {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-semibold text-white tracking-tight">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent tracking-tight">
             Задачи
           </h1>
         </div>
@@ -140,22 +156,25 @@ const Tasks = () => {
                 className={`
                   relative p-4 rounded-2xl border transition-all text-left
                   ${isActive
-                    ? 'bg-gray-800/60 border-gray-600'
+                    ? `bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl ${list.borderColor} shadow-lg`
                     : 'bg-gray-800/30 border-gray-700/50 hover:bg-gray-800/40'
                   }
                 `}
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className={`w-10 h-10 rounded-xl ${list.bgColor} flex items-center justify-center`}>
+                {isActive && (
+                  <div className={`absolute inset-0 bg-gradient-to-br ${list.gradient} rounded-2xl`} />
+                )}
+                <div className="relative flex items-start justify-between mb-3">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${list.gradient} flex items-center justify-center`}>
                     <Icon size={20} className={list.color} />
                   </div>
                   {list.count > 0 && (
-                    <span className="text-sm font-semibold text-gray-400">
+                    <span className={`text-sm font-semibold ${isActive ? list.color : 'text-gray-400'}`}>
                       {list.count}
                     </span>
                   )}
                 </div>
-                <h3 className="text-sm font-medium text-gray-300">
+                <h3 className={`relative text-sm font-medium ${isActive ? 'text-white' : 'text-gray-300'}`}>
                   {list.name}
                 </h3>
               </motion.button>
@@ -164,22 +183,35 @@ const Tasks = () => {
         </div>
 
         {/* Active List Header */}
-        {activeListData && (
+        {activeListData && activeList !== 'completed' && (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-lg ${activeListData.bgColor} flex items-center justify-center`}>
+              <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${activeListData.gradient} flex items-center justify-center`}>
                 <activeListData.icon size={16} className={activeListData.color} />
               </div>
               <h2 className="text-xl font-medium text-white">
                 {activeListData.name}
               </h2>
             </div>
-            <button
+            <Button
               onClick={() => setShowNewTask(true)}
-              className="p-2 hover:bg-gray-700/50 rounded-lg transition-colors"
+              variant="secondary"
+              size="sm"
             >
-              <Plus size={20} className="text-gray-400" />
-            </button>
+              <Plus size={18} />
+              Новая
+            </Button>
+          </div>
+        )}
+
+        {activeList === 'completed' && (
+          <div className="flex items-center gap-3">
+            <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${activeListData.gradient} flex items-center justify-center`}>
+              <activeListData.icon size={16} className={activeListData.color} />
+            </div>
+            <h2 className="text-xl font-medium text-white">
+              {activeListData.name}
+            </h2>
           </div>
         )}
 
@@ -191,9 +223,9 @@ const Tasks = () => {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
             >
-              <Card className="p-4 bg-gray-800/40 border-gray-700/50">
+              <Card className="p-4 bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-xl border-white/5">
                 <div className="flex items-center gap-3">
-                  <Circle size={20} className="text-gray-600 flex-shrink-0" />
+                  <Circle size={20} className="text-blue-400/50 flex-shrink-0" />
                   <input
                     type="text"
                     value={newTaskTitle}
@@ -205,10 +237,20 @@ const Tasks = () => {
                         setNewTaskTitle('');
                       }
                     }}
-                    placeholder="Новая задача"
+                    placeholder="Название задачи..."
                     autoFocus
                     className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500"
                   />
+                  {newTaskTitle && (
+                    <motion.button
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      onClick={handleAddTask}
+                      className="p-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
+                    >
+                      <Plus size={16} className="text-white" />
+                    </motion.button>
+                  )}
                 </div>
               </Card>
             </motion.div>
@@ -217,30 +259,53 @@ const Tasks = () => {
 
         {/* Tasks List */}
         <div className="space-y-2">
-          <AnimatePresence>
+          <AnimatePresence mode="popLayout">
             {currentTasks.map((task) => (
               <motion.div
                 key={task.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
+                exit={{
+                  opacity: 0,
+                  x: task.completed ? 100 : -100,
+                  transition: { duration: 0.2 }
+                }}
                 layout
               >
-                <Card className="p-4 bg-gray-800/30 border-gray-700/50 hover:bg-gray-800/40 transition-all">
-                  <div className="flex items-start gap-3">
-                    <button
+                <Card className={`relative p-4 bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl border-white/5 hover:shadow-lg transition-all group ${task.completed ? 'opacity-60' : ''}`}>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${activeListData.gradient} opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl`} />
+                  <div className="relative flex items-start gap-3">
+                    <motion.button
                       onClick={() => handleToggleComplete(task.id)}
                       className="flex-shrink-0 mt-0.5"
+                      whileTap={{ scale: 0.9 }}
                     >
-                      {task.completed ? (
-                        <CheckCircle2 size={20} className="text-emerald-500" />
-                      ) : (
-                        <Circle size={20} className="text-gray-600 hover:text-gray-500 transition-colors" />
-                      )}
-                    </button>
+                      <AnimatePresence mode="wait">
+                        {task.completed ? (
+                          <motion.div
+                            key="checked"
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            exit={{ scale: 0, rotate: 180 }}
+                            transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                          >
+                            <CheckCircle2 size={22} className="text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="unchecked"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                          >
+                            <Circle size={22} className="text-gray-600 hover:text-gray-500 transition-colors" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.button>
 
                     <div className="flex-1 min-w-0">
-                      <p className={`text-base ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                      <p className={`text-base transition-all ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
                         {task.title}
                       </p>
                       {task.notes && (
@@ -248,20 +313,53 @@ const Tasks = () => {
                           {task.notes}
                         </p>
                       )}
-                      {task.when && task.when !== 'today' && task.when !== 'someday' && (
-                        <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
-                          <Calendar size={12} />
-                          <span>{new Date(task.when).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}</span>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-3 mt-2">
+                        {task.when && task.when !== 'today' && (
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <Calendar size={12} />
+                            <span>{new Date(task.when).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}</span>
+                          </div>
+                        )}
+                        {task.reminder && (
+                          <div className="flex items-center gap-1 text-xs text-amber-500">
+                            <Bell size={12} />
+                            <span>Напоминание</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    <button
-                      onClick={() => handleDeleteTask(task.id)}
-                      className="flex-shrink-0 text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                    >
-                      <ChevronRight size={18} />
-                    </button>
+                    {!task.completed && (
+                      <div className="flex-shrink-0 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {activeList !== 'today' && (
+                          <motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => handleMoveToToday(task.id)}
+                            className="p-1.5 bg-amber-500/20 hover:bg-amber-500/30 rounded-lg transition-colors"
+                            title="В сегодня"
+                          >
+                            <Star size={14} className="text-amber-400" />
+                          </motion.button>
+                        )}
+                        <motion.button
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleDeleteTask(task.id)}
+                          className="p-1.5 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors"
+                        >
+                          <X size={14} className="text-red-400" />
+                        </motion.button>
+                      </div>
+                    )}
+
+                    {task.completed && (
+                      <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleDeleteTask(task.id)}
+                        className="flex-shrink-0 text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                      >
+                        <X size={18} />
+                      </motion.button>
+                    )}
                   </div>
                 </Card>
               </motion.div>
@@ -275,18 +373,21 @@ const Tasks = () => {
               animate={{ opacity: 1 }}
               className="text-center py-16"
             >
-              <div className={`w-16 h-16 rounded-2xl ${activeListData?.bgColor} mx-auto mb-4 flex items-center justify-center`}>
+              <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${activeListData?.gradient} mx-auto mb-4 flex items-center justify-center`}>
                 <activeListData.icon size={32} className={activeListData?.color} />
               </div>
               <p className="text-gray-400 mb-4">
-                Нет задач в "{activeListData?.name}"
+                {activeList === 'completed' ? 'Нет выполненных задач' : `Нет задач в "${activeListData?.name}"`}
               </p>
-              <button
-                onClick={() => setShowNewTask(true)}
-                className="text-sm text-gray-500 hover:text-gray-400 transition-colors"
-              >
-                Добавить задачу
-              </button>
+              {activeList !== 'completed' && (
+                <Button
+                  onClick={() => setShowNewTask(true)}
+                  variant="secondary"
+                  size="sm"
+                >
+                  Добавить задачу
+                </Button>
+              )}
             </motion.div>
           )}
         </div>
