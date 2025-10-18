@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import Card from '../components/ui/Card';
 import Select from '../components/ui/Select';
 import Button from '../components/ui/Button';
+import PremiumModal from '../components/premium/PremiumModal';
 import { useStore } from '../store/useStore';
 import { exportData, clearAllData } from '../db/database';
 import { Globe, Download, Trash2, Crown } from 'lucide-react';
@@ -10,6 +12,7 @@ import { Globe, Download, Trash2, Crown } from 'lucide-react';
 const Settings = () => {
   const { t, i18n } = useTranslation();
   const { language, setLanguage, showToast } = useStore();
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const languageOptions = [
     { value: 'ru', label: 'Русский' },
@@ -104,11 +107,17 @@ const Settings = () => {
             <h2 className="text-xl font-semibold text-yellow-400">{t('premium.title')}</h2>
           </div>
           <p className="text-gray-300 mb-4">{t('premium.aiDescription')}</p>
-          <Button variant="primary" fullWidth>
+          <Button variant="primary" fullWidth onClick={() => setShowPremiumModal(true)}>
             {t('premium.tryPremium')}
           </Button>
           <p className="text-gray-400 text-sm text-center mt-2">{t('premium.price')}</p>
         </Card>
+
+        {/* Premium Modal */}
+        <PremiumModal
+          isOpen={showPremiumModal}
+          onClose={() => setShowPremiumModal(false)}
+        />
 
         {/* About */}
         <Card className="p-6">
@@ -116,7 +125,7 @@ const Settings = () => {
           <div className="space-y-2 text-gray-400">
             <p>{t('settings.version')}: 1.0.0</p>
             <p className="text-xs mt-4">
-              Made with ❤️ for students
+              Made for Roman Makarov
             </p>
           </div>
         </Card>

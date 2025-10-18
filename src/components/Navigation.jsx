@@ -21,8 +21,11 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-gray-800/95 backdrop-blur-md border-t border-gray-700 z-30">
-      <div className="max-w-screen-lg mx-auto px-2 py-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-30 pb-safe">
+      {/* Liquid Glass Background */}
+      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-gray-900/90 to-gray-900/80 backdrop-blur-2xl backdrop-saturate-150 rounded-t-[32px] border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.3)]" />
+
+      <div className="relative max-w-screen-lg mx-auto px-4 py-3">
         <div className="flex items-center justify-around">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -32,25 +35,26 @@ const Navigation = () => {
               <motion.button
                 key={item.id}
                 onClick={() => handleNavigate(item.id)}
-                className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors relative"
-                whileTap={{ scale: 0.95 }}
+                className="flex flex-col items-center gap-1.5 px-5 py-2.5 rounded-[28px] transition-all relative min-w-[72px]"
+                whileTap={{ scale: 0.92 }}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-600/20 rounded-xl"
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    className="absolute inset-0 bg-gradient-to-br from-blue-500/25 via-purple-500/20 to-pink-500/25 backdrop-blur-xl rounded-[28px] shadow-lg border border-white/10"
+                    transition={{ type: 'spring', stiffness: 400, damping: 35 }}
                   />
                 )}
                 <Icon
-                  size={24}
-                  className={`relative z-10 transition-colors ${
-                    isActive ? 'text-blue-400' : 'text-gray-400'
+                  size={26}
+                  strokeWidth={isActive ? 2.5 : 2}
+                  className={`relative z-10 transition-all duration-300 ${
+                    isActive ? 'text-blue-300 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]' : 'text-gray-400'
                   }`}
                 />
                 <span
-                  className={`text-xs font-medium relative z-10 transition-colors ${
-                    isActive ? 'text-blue-400' : 'text-gray-400'
+                  className={`text-[10px] font-semibold relative z-10 transition-all duration-300 ${
+                    isActive ? 'text-blue-300' : 'text-gray-500'
                   }`}
                 >
                   {item.label}

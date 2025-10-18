@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Plus, BookOpen } from 'lucide-react';
 import Button from '../components/ui/Button';
-import DailyCheckIn from '../components/journal/DailyCheckIn';
+import MultiStepCheckIn from '../components/journal/MultiStepCheckIn';
 import JournalCalendar from '../components/journal/JournalCalendar';
 import { journalEntries } from '../db/database';
 
@@ -71,7 +71,7 @@ const Journal = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
           >
-            <DailyCheckIn
+            <MultiStepCheckIn
               existingEntry={todayEntry}
               onSave={handleSaveEntry}
               onCancel={() => setShowCheckIn(false)}
@@ -147,24 +147,39 @@ const Journal = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="grid grid-cols-3 gap-4"
+            className="grid grid-cols-3 gap-3"
           >
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-blue-400">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl backdrop-saturate-150 rounded-2xl p-4 text-center border border-white/5 shadow-lg hover:shadow-blue-500/20 transition-all active:shadow-blue-500/40"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent rounded-2xl" />
+              <p className="relative text-2xl font-bold text-blue-400 mb-1">
                 {hasEntries ? '🎉' : '0'}
               </p>
-              <p className="text-sm text-gray-400 mt-1">Записей</p>
-            </div>
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-green-400">
+              <p className="relative text-xs text-gray-400 font-medium">Записей</p>
+            </motion.button>
+
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={todayEntry ? handleNewEntry : undefined}
+              className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl backdrop-saturate-150 rounded-2xl p-4 text-center border border-white/5 shadow-lg hover:shadow-green-500/20 transition-all active:shadow-green-500/40"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent rounded-2xl" />
+              <p className="relative text-2xl font-bold text-green-400 mb-1">
                 {todayEntry ? '✅' : '⏳'}
               </p>
-              <p className="text-sm text-gray-400 mt-1">Сегодня</p>
-            </div>
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-purple-400">📈</p>
-              <p className="text-sm text-gray-400 mt-1">Прогресс</p>
-            </div>
+              <p className="relative text-xs text-gray-400 font-medium">Сегодня</p>
+            </motion.button>
+
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              className="relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl backdrop-saturate-150 rounded-2xl p-4 text-center border border-white/5 shadow-lg hover:shadow-purple-500/20 transition-all active:shadow-purple-500/40"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl" />
+              <p className="relative text-2xl font-bold text-purple-400 mb-1">📈</p>
+              <p className="relative text-xs text-gray-400 font-medium">Прогресс</p>
+            </motion.button>
           </motion.div>
         )}
       </div>

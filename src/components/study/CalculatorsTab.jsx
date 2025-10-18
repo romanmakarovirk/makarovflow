@@ -8,10 +8,10 @@ import { haptic } from '../../utils/telegram';
 
 const CalculatorsTab = () => {
   const { t } = useTranslation();
-  const [activeCalculator, setActiveCalculator] = useState('gpa');
+  const [activeCalculator, setActiveCalculator] = useState('average');
 
   const calculators = [
-    { id: 'gpa', name: 'GPA', icon: BookOpen, color: 'from-blue-500 to-purple-600' },
+    { id: 'average', name: 'Средний балл', icon: BookOpen, color: 'from-blue-500 to-purple-600' },
     { id: 'basic', name: 'Базовый', icon: Calculator, color: 'from-green-500 to-teal-600' },
     { id: 'percent', name: 'Проценты', icon: Percent, color: 'from-orange-500 to-red-600' },
     { id: 'circle', name: 'Геометрия', icon: Circle, color: 'from-purple-500 to-pink-600' }
@@ -52,7 +52,7 @@ const CalculatorsTab = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {activeCalculator === 'gpa' && <GPACalculator />}
+        {activeCalculator === 'average' && <AverageCalculator />}
         {activeCalculator === 'basic' && <BasicCalculator />}
         {activeCalculator === 'percent' && <PercentCalculator />}
         {activeCalculator === 'circle' && <GeometryCalculator />}
@@ -61,27 +61,30 @@ const CalculatorsTab = () => {
   );
 };
 
-// GPA Calculator
-const GPACalculator = () => {
+// Average Grade Calculator (Dnevnik.ru system)
+const AverageCalculator = () => {
   const [grades, setGrades] = useState([
-    { subject: '', grade: '', credits: '' }
+    { grade: '', weight: '1' }
   ]);
-  const [gpa, setGpa] = useState(null);
+  const [average, setAverage] = useState(null);
+  const [targetAverage, setTargetAverage] = useState('');
+  const [gradesNeeded, setGradesNeeded] = useState(null);
 
-  const gradePoints = {
-    'A': 5,
-    'B': 4,
-    'C': 3,
-    'D': 2,
-    'F': 1
-  };
+  const weights = [
+    { value: '1', label: 'Обычная (1x)' },
+    { value: '2', label: 'Важная (2x)' },
+    { value: '3', label: 'Очень важная (3x)' },
+    { value: '5', label: 'Экзамен (5x)' }
+  ];
 
   const addGrade = () => {
-    setGrades([...grades, { subject: '', grade: '', credits: '' }]);
+    setGrades([...grades, { grade: '', weight: '1' }]);
+    haptic.light();
   };
 
   const removeGrade = (index) => {
     setGrades(grades.filter((_, i) => i !== index));
+    haptic.light();
   };
 
   const updateGrade = (index, field, value) => {
@@ -90,23 +93,72 @@ const GPACalculator = () => {
     setGrades(newGrades);
   };
 
-  const calculateGPA = () => {
+  const calculateAverage = () => {
     let totalPoints = 0;
-    let totalCredits = 0;
+    let totalWeight = 0;
 
     for (const item of grades) {
-      if (item.grade && item.credits) {
-        const points = gradePoints[item.grade] || 0;
-        const credits = parseFloat(item.credits) || 0;
-        totalPoints += points * credits;
-        totalCredits += credits;
+      if (item.grade) {
+        const grade = parseFloat(item.grade);
+        const weight = parseFloat(item.weight) || 1;
+
+        if (!isNaN(grade) && grade >= 1 && grade <= 5) {
+          totalPoints += grade * weight;
+          totalWeight += weight;
+        }
       }
     }
 
-    if (totalCredits > 0) {
-      const result = (totalPoints / totalCredits).toFixed(2);
-      setGpa(result);
+    if (totalWeight > 0) {
+      const result = (totalPoints / totalWeight).toFixed(2);
+      setAverage(result);
       haptic.success();
+    }
+  };
+
+  const calculateNeededGrades = () => {
+    if (!average || !targetAverage) return;
+
+    const current = parseFloat(average);
+    const target = parseFloat(targetAverage);
+
+    if (isNaN(current) || isNaN(target) || target < current) {
+      setGradesNeeded(null);
+      return;
+    }
+
+    // Подсчитаем текущую взвешенную сумму
+    let totalPoints = 0;
+    let totalWeight = 0;
+
+    for (const item of grades) {
+      if (item.grade) {
+        const grade = parseFloat(item.grade);
+        const weight = parseFloat(item.weight) || 1;
+
+        if (!isNaN(grade) && grade >= 1 && grade <= 5) {
+          totalPoints += grade * weight;
+          totalWeight += weight;
+        }
+      }
+    }
+
+    // Рассчитаем сколько пятёрок нужно
+    let fivesNeeded = 0;
+    let currentAvg = current;
+
+    while (currentAvg < target && fivesNeeded < 100) {
+      totalPoints += 5;
+      totalWeight += 1;
+      currentAvg = totalPoints / totalWeight;
+      fivesNeeded++;
+    }
+
+    if (fivesNeeded < 100) {
+      setGradesNeeded(fivesNeeded);
+      haptic.success();
+    } else {
+      setGradesNeeded(null);
     }
   };
 
@@ -114,42 +166,37 @@ const GPACalculator = () => {
     <Card className="p-6">
       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
         <BookOpen size={20} />
-        GPA Калькулятор
+        Средний балл (Дневник.ру)
       </h3>
 
       <div className="space-y-3 mb-4">
         {grades.map((item, index) => (
-          <div key={index} className="grid grid-cols-12 gap-2">
-            <input
-              type="text"
-              placeholder="Предмет"
-              value={item.subject}
-              onChange={(e) => updateGrade(index, 'subject', e.target.value)}
-              className="col-span-5 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <select
-              value={item.grade}
-              onChange={(e) => updateGrade(index, 'grade', e.target.value)}
-              className="col-span-3 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Оценка</option>
-              <option value="A">A (5)</option>
-              <option value="B">B (4)</option>
-              <option value="C">C (3)</option>
-              <option value="D">D (2)</option>
-              <option value="F">F (1)</option>
-            </select>
+          <div key={index} className="flex gap-2">
             <input
               type="number"
-              placeholder="Кредиты"
-              value={item.credits}
-              onChange={(e) => updateGrade(index, 'credits', e.target.value)}
-              className="col-span-3 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              min="1"
+              max="5"
+              step="1"
+              placeholder="Оценка (1-5)"
+              value={item.grade}
+              onChange={(e) => updateGrade(index, 'grade', e.target.value)}
+              className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <select
+              value={item.weight}
+              onChange={(e) => updateGrade(index, 'weight', e.target.value)}
+              className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {weights.map((w) => (
+                <option key={w.value} value={w.value}>
+                  {w.label}
+                </option>
+              ))}
+            </select>
             {grades.length > 1 && (
               <button
                 onClick={() => removeGrade(index)}
-                className="col-span-1 text-red-400 hover:text-red-300"
+                className="px-3 text-red-400 hover:text-red-300"
               >
                 <X size={20} />
               </button>
@@ -161,22 +208,57 @@ const GPACalculator = () => {
       <div className="flex gap-2 mb-4">
         <Button onClick={addGrade} variant="secondary" fullWidth>
           <Plus size={18} />
-          Добавить предмет
+          Добавить оценку
         </Button>
-        <Button onClick={calculateGPA} variant="primary" fullWidth>
-          Рассчитать GPA
+        <Button onClick={calculateAverage} variant="primary" fullWidth>
+          Рассчитать
         </Button>
       </div>
 
-      {gpa !== null && (
+      {average !== null && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-gradient-to-r from-blue-500/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-6 text-center"
+          className="space-y-4"
         >
-          <p className="text-sm text-gray-400 mb-2">Средний балл (GPA)</p>
-          <p className="text-5xl font-bold text-blue-400">{gpa}</p>
-          <p className="text-xs text-gray-500 mt-2">из 5.0</p>
+          <div className="bg-gradient-to-r from-blue-500/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-6 text-center">
+            <p className="text-sm text-gray-400 mb-2">Средний балл</p>
+            <p className="text-5xl font-bold text-blue-400">{average}</p>
+            <p className="text-xs text-gray-500 mt-2">из 5.0</p>
+          </div>
+
+          {/* Калькулятор нужных оценок */}
+          <div className="bg-gray-800/50 rounded-xl p-4 space-y-3">
+            <p className="text-sm font-medium text-gray-300">
+              Сколько пятёрок нужно для повышения?
+            </p>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                min="1"
+                max="5"
+                step="0.01"
+                placeholder="Желаемый балл"
+                value={targetAverage}
+                onChange={(e) => setTargetAverage(e.target.value)}
+                className="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <Button onClick={calculateNeededGrades} variant="secondary">
+                Узнать
+              </Button>
+            </div>
+            {gradesNeeded !== null && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3 text-center"
+              >
+                <p className="text-sm text-gray-400 mb-1">Нужно получить</p>
+                <p className="text-3xl font-bold text-purple-400">{gradesNeeded}</p>
+                <p className="text-xs text-gray-500 mt-1">пятёрок (обычных)</p>
+              </motion.div>
+            )}
+          </div>
         </motion.div>
       )}
     </Card>
