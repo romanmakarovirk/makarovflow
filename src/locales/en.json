@@ -1,0 +1,157 @@
+{
+  "app": {
+    "name": "MindFlow",
+    "tagline": "Your digital mood journal"
+  },
+  "nav": {
+    "journal": "Journal",
+    "insights": "Insights",
+    "study": "Study",
+    "settings": "Settings"
+  },
+  "journal": {
+    "title": "Journal",
+    "today": "Today",
+    "dailyCheckIn": "Daily Check-in",
+    "howAreYou": "How are you feeling?",
+    "energyLevel": "Energy Level",
+    "sleepLastNight": "Sleep Last Night",
+    "sleepHours": "hours",
+    "sleepQuality": "Sleep Quality",
+    "whatHappened": "What happened today?",
+    "addTags": "Add tags",
+    "tellAboutDay": "Tell us about your day",
+    "addPhoto": "Add photo",
+    "saveEntry": "Save Entry",
+    "updateEntry": "Update Entry",
+    "history": "History",
+    "noEntries": "No entries yet",
+    "createFirst": "Create your first entry!",
+    "tags": {
+      "walked_outside": "Walked outside",
+      "lot_of_homework": "Lot of homework",
+      "met_friends": "Met friends",
+      "exercised": "Exercised",
+      "felt_stressed": "Felt stressed",
+      "ate_well": "Ate well",
+      "productive_day": "Productive day",
+      "lazy_day": "Lazy day",
+      "studied": "Studied",
+      "watched_movies": "Watched movies",
+      "played_games": "Played games",
+      "family_time": "Family time"
+    }
+  },
+  "insights": {
+    "title": "Insights",
+    "weeklySummary": "Weekly Summary",
+    "week": "Week",
+    "averageMood": "Average Mood",
+    "averageSleep": "Average Sleep",
+    "averageEnergy": "Average Energy",
+    "goodDays": "Good Days",
+    "of": "of",
+    "moodTrend": "Mood Trend",
+    "sleepPattern": "Sleep Pattern",
+    "correlation": "Correlation",
+    "insights": "Insights",
+    "noData": "Not enough data",
+    "createEntries": "Create some entries to see insights",
+    "period": {
+      "week": "Week",
+      "month": "Month",
+      "3months": "3 Months"
+    },
+    "exportData": "Export Data"
+  },
+  "study": {
+    "title": "Study",
+    "schedule": "Schedule",
+    "homework": "Homework",
+    "calculators": "Calculators",
+    "addLesson": "Add Lesson",
+    "addHomework": "Add Homework",
+    "subject": "Subject",
+    "time": "Time",
+    "room": "Room",
+    "description": "Description",
+    "dueDate": "Due Date",
+    "priority": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "completed": "Completed",
+    "pending": "Pending",
+    "noSchedule": "No schedule yet",
+    "noHomework": "No homework",
+    "nextLesson": "Next Lesson",
+    "currentLesson": "Now",
+    "calculators": {
+      "basic": "Basic Calculator",
+      "gpa": "GPA Calculator",
+      "percentage": "Percentage Calculator",
+      "geometry": "Geometry",
+      "deadline": "Time to Deadline",
+      "numeral": "Numeral Systems"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "notifications": "Notifications",
+    "dailyReminder": "Daily reminder",
+    "homeworkReminders": "Homework reminders",
+    "weeklyInsights": "Weekly insights",
+    "data": "Data",
+    "exportData": "Export Data",
+    "deleteAllData": "Delete All Data",
+    "premium": "Premium",
+    "managePremium": "Manage Subscription",
+    "about": "About",
+    "version": "Version",
+    "privacy": "Privacy Policy",
+    "feedback": "Feedback"
+  },
+  "premium": {
+    "title": "MindFlow Premium",
+    "aiAnalyzer": "AI Analyzer",
+    "aiDescription": "Get detailed analysis with predictions and recommendations from AI",
+    "studyAI": "Study AI",
+    "studyDescription": "Help with homework, explanations, flashcard generation",
+    "tryPremium": "Try Premium",
+    "price": "$2.99/mo or $19.99/year",
+    "unlock": "Unlock Premium"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning"
+  },
+  "mood": {
+    "veryBad": "Very bad",
+    "bad": "Bad",
+    "neutral": "Neutral",
+    "good": "Good",
+    "veryGood": "Very good"
+  },
+  "days": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  }
+}

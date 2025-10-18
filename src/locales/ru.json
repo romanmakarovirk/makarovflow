@@ -1,0 +1,157 @@
+{
+  "app": {
+    "name": "MindFlow",
+    "tagline": "Твой цифровой дневник настроения"
+  },
+  "nav": {
+    "journal": "Дневник",
+    "insights": "Аналитика",
+    "study": "Учёба",
+    "settings": "Настройки"
+  },
+  "journal": {
+    "title": "Дневник",
+    "today": "Сегодня",
+    "dailyCheckIn": "Ежедневная запись",
+    "howAreYou": "Как твоё настроение?",
+    "energyLevel": "Уровень энергии",
+    "sleepLastNight": "Сон этой ночью",
+    "sleepHours": "часов",
+    "sleepQuality": "Качество сна",
+    "whatHappened": "Что было сегодня?",
+    "addTags": "Добавить теги",
+    "tellAboutDay": "Расскажи о своём дне",
+    "addPhoto": "Добавить фото",
+    "saveEntry": "Сохранить запись",
+    "updateEntry": "Обновить запись",
+    "history": "История",
+    "noEntries": "Пока нет записей",
+    "createFirst": "Создай свою первую запись!",
+    "tags": {
+      "walked_outside": "Гулял на улице",
+      "lot_of_homework": "Много домашки",
+      "met_friends": "Встречался с друзьями",
+      "exercised": "Занимался спортом",
+      "felt_stressed": "Был в стрессе",
+      "ate_well": "Хорошо питался",
+      "productive_day": "Продуктивный день",
+      "lazy_day": "Ленивый день",
+      "studied": "Учился",
+      "watched_movies": "Смотрел фильмы",
+      "played_games": "Играл в игры",
+      "family_time": "Время с семьёй"
+    }
+  },
+  "insights": {
+    "title": "Аналитика",
+    "weeklySummary": "Недельная сводка",
+    "week": "Неделя",
+    "averageMood": "Среднее настроение",
+    "averageSleep": "Средний сон",
+    "averageEnergy": "Средняя энергия",
+    "goodDays": "Хорошие дни",
+    "of": "из",
+    "moodTrend": "Динамика настроения",
+    "sleepPattern": "Режим сна",
+    "correlation": "Корреляция",
+    "insights": "Инсайты",
+    "noData": "Недостаточно данных",
+    "createEntries": "Создай несколько записей для аналитики",
+    "period": {
+      "week": "Неделя",
+      "month": "Месяц",
+      "3months": "3 месяца"
+    },
+    "exportData": "Экспорт данных"
+  },
+  "study": {
+    "title": "Учёба",
+    "schedule": "Расписание",
+    "homework": "Домашка",
+    "calculators": "Калькуляторы",
+    "addLesson": "Добавить урок",
+    "addHomework": "Добавить задание",
+    "subject": "Предмет",
+    "time": "Время",
+    "room": "Аудитория",
+    "description": "Описание",
+    "dueDate": "Срок сдачи",
+    "priority": {
+      "high": "Высокий",
+      "medium": "Средний",
+      "low": "Низкий"
+    },
+    "completed": "Выполнено",
+    "pending": "В ожидании",
+    "noSchedule": "Расписание пусто",
+    "noHomework": "Нет домашних заданий",
+    "nextLesson": "Следующий урок",
+    "currentLesson": "Сейчас",
+    "calculators": {
+      "basic": "Обычный калькулятор",
+      "gpa": "Средний балл (GPA)",
+      "percentage": "Процентный калькулятор",
+      "geometry": "Геометрия",
+      "deadline": "Время до дедлайна",
+      "numeral": "Системы счисления"
+    }
+  },
+  "settings": {
+    "title": "Настройки",
+    "language": "Язык интерфейса",
+    "notifications": "Уведомления",
+    "dailyReminder": "Напоминание о записи",
+    "homeworkReminders": "Напоминания о домашке",
+    "weeklyInsights": "Еженедельные инсайты",
+    "data": "Данные",
+    "exportData": "Экспорт данных",
+    "deleteAllData": "Удалить все данные",
+    "premium": "Premium",
+    "managePremium": "Управление подпиской",
+    "about": "О приложении",
+    "version": "Версия",
+    "privacy": "Политика конфиденциальности",
+    "feedback": "Обратная связь"
+  },
+  "premium": {
+    "title": "MindFlow Premium",
+    "aiAnalyzer": "AI Анализатор",
+    "aiDescription": "Получи детальный анализ с предсказаниями и рекомендациями от искусственного интеллекта",
+    "studyAI": "Study AI",
+    "studyDescription": "Помощь с домашкой, объяснение сложных тем, генерация флэш-карточек",
+    "tryPremium": "Попробовать Premium",
+    "price": "$2.99/мес или $19.99/год",
+    "unlock": "Разблокировать Premium"
+  },
+  "common": {
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "add": "Добавить",
+    "close": "Закрыть",
+    "confirm": "Подтвердить",
+    "yes": "Да",
+    "no": "Нет",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успешно",
+    "warning": "Предупреждение"
+  },
+  "mood": {
+    "veryBad": "Очень плохо",
+    "bad": "Плохо",
+    "neutral": "Нормально",
+    "good": "Хорошо",
+    "veryGood": "Отлично"
+  },
+  "days": {
+    "monday": "Понедельник",
+    "tuesday": "Вторник",
+    "wednesday": "Среда",
+    "thursday": "Четверг",
+    "friday": "Пятница",
+    "saturday": "Суббота",
+    "sunday": "Воскресенье"
+  }
+}
