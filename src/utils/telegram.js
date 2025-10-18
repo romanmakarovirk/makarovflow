@@ -144,4 +144,7 @@ export const isTelegramWebApp = () => {
   return typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp;
 };
 
+// Export WebApp instance
+export const webApp = WebApp;
+
 export default WebApp;

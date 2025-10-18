@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { BookOpen, BarChart3, GraduationCap, Settings } from 'lucide-react';
+import { BookOpen, BarChart3, GraduationCap, Settings, CheckSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/useStore';
 import { haptic } from '../utils/telegram';
@@ -10,6 +10,7 @@ const Navigation = () => {
 
   const navItems = [
     { id: 'journal', icon: BookOpen, label: t('nav.journal') },
+    { id: 'tasks', icon: CheckSquare, label: 'Задачи' },
     { id: 'insights', icon: BarChart3, label: t('nav.insights') },
     { id: 'study', icon: GraduationCap, label: t('nav.study') },
     { id: 'settings', icon: Settings, label: t('nav.settings') }

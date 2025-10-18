@@ -183,10 +183,12 @@ const ScheduleTab = () => {
       ) : (
         <Card className="p-12 text-center">
           <p className="text-gray-400 mb-4">{t('study.noSchedule')}</p>
-          <Button onClick={handleAddLesson} variant="primary">
-            <Plus size={20} />
-            {t('study.addLesson')}
-          </Button>
+          <div className="flex justify-center">
+            <Button onClick={handleAddLesson} variant="primary">
+              <Plus size={20} />
+              {t('study.addLesson')}
+            </Button>
+          </div>
         </Card>
       )}
 
