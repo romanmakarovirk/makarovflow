@@ -1,8 +1,10 @@
 import { Bot, InlineKeyboard } from 'grammy';
+import http from 'http';
 
 // Bot configuration from environment variables
 const BOT_TOKEN = process.env.BOT_TOKEN || '8353631022:AAHWAts6QguP9--0S4eWxM1rb0Dr40Cmy2Y';
 const WEB_APP_URL = process.env.WEB_APP_URL || 'https://superlative-gelato-2ffbac.netlify.app';
+const PORT = process.env.PORT || 3000;
 
 // Создаём бота
 const bot = new Bot(BOT_TOKEN);
@@ -51,4 +53,18 @@ bot.start({
 // Обработка ошибок
 bot.catch((err) => {
   console.error('❌ Ошибка:', err);
+});
+
+// Создаём HTTP сервер для Render (требуется открытый порт)
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({
+    status: 'ok',
+    bot: 'MakarovFlow',
+    uptime: process.uptime()
+  }));
+});
+
+server.listen(PORT, () => {
+  console.log(`🌐 HTTP Server running on port ${PORT}`);
 });
