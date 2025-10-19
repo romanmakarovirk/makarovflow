@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { BookOpen, Sparkles, Settings, CheckSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/useStore';
@@ -16,6 +15,7 @@ const Navigation = () => {
   ];
 
   const handleNavigate = (pageId) => {
+    if (currentPage === pageId) return; // Не переключать если уже на этой странице
     haptic.light();
     setCurrentPage(pageId);
   };
@@ -37,64 +37,42 @@ const Navigation = () => {
             const isActive = currentPage === item.id;
 
             return (
-              <motion.button
+              <button
                 key={item.id}
                 onClick={() => handleNavigate(item.id)}
-                className="flex flex-col items-center gap-1.5 px-5 py-2.5 rounded-[20px] transition-all relative min-w-[68px]"
-                whileTap={{ scale: 0.9 }}
-                animate={{
-                  scale: isActive ? 1.02 : 1
-                }}
-                transition={{ duration: 0.2 }}
+                className="flex flex-col items-center gap-1.5 px-5 py-2.5 rounded-[18px] transition-all duration-200 relative min-w-[68px] active:scale-95"
               >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabBg"
-                    className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-[0.18] rounded-[20px] shadow-lg border border-white/[0.15]`}
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
+                {/* Background for active tab - без layoutId чтобы не моргал */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-[18px] shadow-lg border border-white/[0.15] transition-opacity duration-200 ${
+                  isActive ? 'opacity-[0.18]' : 'opacity-0'
+                }`} />
 
-                <motion.div
-                  className="relative z-10"
-                  animate={{
-                    y: isActive ? -2 : 0
-                  }}
-                  transition={{ duration: 0.2 }}
-                >
+                <div className={`relative z-10 transition-transform duration-200 ${isActive ? '-translate-y-0.5' : ''}`}>
                   <Icon
                     size={23}
                     strokeWidth={isActive ? 2.5 : 2}
-                    className={`transition-all duration-200 ${
+                    className={`transition-colors duration-200 ${
                       isActive ? 'text-white' : 'text-gray-500'
                     }`}
                     style={isActive ? {
                       filter: 'drop-shadow(0 2px 6px rgba(147, 51, 234, 0.4))'
                     } : {}}
                   />
-                </motion.div>
+                </div>
 
-                <motion.span
+                <span
                   className={`text-[10px] font-semibold relative z-10 transition-all duration-200 ${
                     isActive ? `bg-gradient-to-br ${item.gradient} bg-clip-text text-transparent font-bold` : 'text-gray-500'
                   }`}
-                  animate={{
-                    opacity: isActive ? 1 : 0.85
-                  }}
                 >
                   {item.label}
-                </motion.span>
+                </span>
 
-                {/* Active indicator dot */}
-                {isActive && (
-                  <motion.div
-                    layoutId="activeDot"
-                    className={`absolute -bottom-1 left-1/2 w-1 h-1 rounded-full bg-gradient-to-r ${item.gradient}`}
-                    style={{ x: '-50%' }}
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
-              </motion.button>
+                {/* Active indicator dot - без layoutId */}
+                <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-gradient-to-r ${item.gradient} transition-opacity duration-200 ${
+                  isActive ? 'opacity-100' : 'opacity-0'
+                }`} />
+              </button>
             );
           })}
         </div>
