@@ -1,12 +1,13 @@
 services:
   - type: web
-    name: mindflow-bot
-    runtime: node
-    rootDir: bot-server
-    buildCommand: npm install
-    startCommand: npm start
+    name: mindflow-app
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: WEB_APP_URL
-        value: https://superlative-gelato-2ffbac.netlify.app
+      - key: VITE_OPENROUTER_API_KEY
+        value: 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
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: ALLOWALL
