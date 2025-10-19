@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: mindflow-bot
+    runtime: node
+    rootDir: bot-server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: WEB_APP_URL
+        value: https://superlative-gelato-2ffbac.netlify.app
