@@ -199,8 +199,64 @@ export const sendMessage = async (userMessage, conversationHistory = []) => {
     // Get user context
     const context = await getUserContext();
 
-    // Use intelligent keyword-based responses instead of unreliable free models
-    // This gives much better, contextual Russian responses
+    // Try to use OpenRouter API with Claude
+    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+
+    if (apiKey && apiKey !== '' && apiKey !== 'your_api_key_here') {
+      try {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': window.location.origin,
+            'X-Title': 'MindFlow App'
+          },
+          body: JSON.stringify({
+            model: 'anthropic/claude-3.5-sonnet',
+            messages: [
+              {
+                role: 'system',
+                content: `Ты — персональный AI-помощник в приложении MindFlow. Твоя задача — помогать пользователю с анализом настроения, продуктивностью, привычками и мотивацией. Отвечай на русском языке, будь эмпатичным, поддерживающим и конкретным в советах.
+
+${context}
+
+Давай практичные советы, основанные на данных пользователя. Будь кратким, но полезным (2-4 предложения).`
+              },
+              ...conversationHistory.map(msg => ({
+                role: msg.role,
+                content: msg.content
+              })),
+              {
+                role: 'user',
+                content: userMessage
+              }
+            ],
+            max_tokens: 500,
+            temperature: 0.7
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`OpenRouter API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const aiMessage = data.choices?.[0]?.message?.content;
+
+        if (aiMessage) {
+          return {
+            success: true,
+            message: aiMessage
+          };
+        }
+      } catch (apiError) {
+        console.error('OpenRouter API error:', apiError);
+        // Fall back to local responses if API fails
+      }
+    }
+
+    // Fallback to smart local responses if no API key or API fails
     const response = generateFallbackResponse(userMessage, context);
 
     return {

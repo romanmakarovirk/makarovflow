@@ -14,9 +14,14 @@ const ScheduleManager = ({ isOpen, onClose }) => {
   const { showToast } = useStore();
   const [scheduleItems, setScheduleItems] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
+  const getDefaultDay = () => {
+    let day = new Date().getDay();
+    return day === 0 ? 7 : day; // Воскресенье = 7, остальные без изменений
+  };
+
   const [formData, setFormData] = useState({
     subject: '',
-    dayOfWeek: new Date().getDay() || 1,
+    dayOfWeek: getDefaultDay(),
     startTime: '09:00',
     endTime: '10:30',
     room: '',
@@ -46,7 +51,7 @@ const ScheduleManager = ({ isOpen, onClose }) => {
     setShowAddForm(false);
     setFormData({
       subject: '',
-      dayOfWeek: new Date().getDay() || 1,
+      dayOfWeek: getDefaultDay(),
       startTime: '09:00',
       endTime: '10:30',
       room: '',
@@ -65,49 +70,81 @@ const ScheduleManager = ({ isOpen, onClose }) => {
   };
 
   const getTodaySchedule = () => {
-    const today = new Date().getDay();
+    let today = new Date().getDay();
+    // Воскресенье = 0, но в нашей системе 1-7 (Пн-Вс)
+    if (today === 0) today = 7;
     return scheduleItems.filter(item => item.dayOfWeek === today);
   };
 
   const todayItems = getTodaySchedule();
 
+  // Group all items by day
+  const groupedByDay = {};
+  scheduleItems.forEach(item => {
+    if (!groupedByDay[item.dayOfWeek]) {
+      groupedByDay[item.dayOfWeek] = [];
+    }
+    groupedByDay[item.dayOfWeek].push(item);
+  });
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Расписание">
       <div className="space-y-4">
-        {/* Today's schedule */}
-        <div>
-          <h3 className="text-sm font-semibold text-gray-400 mb-3">Сегодня ({DAYS[new Date().getDay() - 1] || 'Вс'})</h3>
-          {todayItems.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-6">Сегодня нет уроков</p>
-          ) : (
-            <div className="space-y-2">
-              {todayItems.map((item) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-xl"
-                >
-                  <div className="w-1 h-12 rounded-full" style={{ backgroundColor: item.color }} />
-                  <div className="flex-1">
-                    <p className="font-medium text-white">{item.subject}</p>
-                    <p className="text-xs text-gray-400">
-                      {item.startTime} - {item.endTime}
-                      {item.room && ` • ${item.room}`}
-                    </p>
+        {/* All schedule items grouped by day */}
+        {scheduleItems.length === 0 ? (
+          <div className="text-center py-8">
+            <Calendar size={48} className="text-gray-600 mx-auto mb-3" />
+            <p className="text-sm text-gray-500">Расписание пусто</p>
+            <p className="text-xs text-gray-600 mt-1">Добавьте первый урок</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {DAYS.map((dayName, idx) => {
+              const dayNumber = idx + 1;
+              const dayItems = groupedByDay[dayNumber] || [];
+              const isToday = dayNumber === (new Date().getDay() === 0 ? 7 : new Date().getDay());
+
+              if (dayItems.length === 0) return null;
+
+              return (
+                <div key={dayNumber}>
+                  <h3 className="text-sm font-semibold text-gray-400 mb-2 flex items-center gap-2">
+                    {dayName}
+                    {isToday && <span className="text-xs text-blue-400">• Сегодня</span>}
+                  </h3>
+                  <div className="space-y-2">
+                    {dayItems
+                      .sort((a, b) => a.startTime.localeCompare(b.startTime))
+                      .map((item) => (
+                        <motion.div
+                          key={item.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 20 }}
+                          className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-xl"
+                        >
+                          <div className="w-1 h-12 rounded-full" style={{ backgroundColor: item.color }} />
+                          <div className="flex-1">
+                            <p className="font-medium text-white">{item.subject}</p>
+                            <p className="text-xs text-gray-400">
+                              {item.startTime} - {item.endTime}
+                              {item.room && ` • ${item.room}`}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => handleDelete(item.id)}
+                            className="p-2 hover:bg-gray-700/50 rounded-lg transition-colors"
+                          >
+                            <X size={16} className="text-gray-400" />
+                          </button>
+                        </motion.div>
+                      ))}
                   </div>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="p-2 hover:bg-gray-700/50 rounded-lg transition-colors"
-                  >
-                    <X size={16} className="text-gray-400" />
-                  </button>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Add new */}
         <AnimatePresence>

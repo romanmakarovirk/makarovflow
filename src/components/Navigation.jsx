@@ -22,19 +22,16 @@ const Navigation = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-30 pb-safe">
-      {/* iOS 26 Frosted Glass Background */}
-      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/98 via-gray-900/95 to-gray-900/80 backdrop-blur-3xl backdrop-saturate-200 rounded-t-[40px] border-t border-white/[0.08] shadow-[0_-20px_60px_rgba(0,0,0,0.4)]">
-        {/* Subtle gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-purple-500/[0.03] via-blue-500/[0.02] to-transparent rounded-t-[40px]" />
-        {/* Noise texture for depth */}
-        <div className="absolute inset-0 opacity-[0.015] mix-blend-overlay rounded-t-[40px]" style={{
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'4\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
-          backgroundSize: '200px 200px'
-        }} />
+      {/* Enhanced Frosted Glass Background */}
+      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/98 via-gray-900/96 to-gray-900/85 backdrop-blur-3xl backdrop-saturate-[180%] rounded-t-[32px] border-t border-white/[0.1] shadow-[0_-12px_40px_rgba(0,0,0,0.5)]">
+        {/* Dynamic gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-purple-600/[0.04] via-blue-500/[0.02] to-transparent rounded-t-[32px]" />
+        {/* Subtle top glow */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.15] to-transparent" />
       </div>
 
-      <div className="relative max-w-screen-lg mx-auto px-6 py-4">
-        <div className="flex items-center justify-around">
+      <div className="relative max-w-screen-lg mx-auto px-4 py-3">
+        <div className="flex items-center justify-around gap-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
@@ -43,38 +40,60 @@ const Navigation = () => {
               <motion.button
                 key={item.id}
                 onClick={() => handleNavigate(item.id)}
-                className="flex flex-col items-center gap-2 px-4 py-2 rounded-[24px] transition-all relative min-w-[70px]"
-                whileTap={{ scale: 0.88 }}
-                whileHover={{ scale: 1.05 }}
+                className="flex flex-col items-center gap-1.5 px-5 py-2.5 rounded-[20px] transition-all relative min-w-[68px]"
+                whileTap={{ scale: 0.9 }}
+                animate={{
+                  scale: isActive ? 1.02 : 1
+                }}
+                transition={{ duration: 0.2 }}
               >
                 {isActive && (
                   <motion.div
-                    layoutId="activeTab"
-                    className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-20 backdrop-blur-2xl rounded-[24px] shadow-2xl border border-white/[0.12]`}
-                    transition={{ type: 'spring', stiffness: 500, damping: 40 }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-t from-white/[0.05] to-transparent rounded-[24px]" />
-                  </motion.div>
+                    layoutId="activeTabBg"
+                    className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-[0.18] rounded-[20px] shadow-lg border border-white/[0.15]`}
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                  />
                 )}
-                <div className="relative z-10">
+
+                <motion.div
+                  className="relative z-10"
+                  animate={{
+                    y: isActive ? -2 : 0
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
                   <Icon
-                    size={24}
+                    size={23}
                     strokeWidth={isActive ? 2.5 : 2}
-                    className={`transition-all duration-300 ${
+                    className={`transition-all duration-200 ${
                       isActive ? 'text-white' : 'text-gray-500'
                     }`}
                     style={isActive ? {
-                      filter: 'drop-shadow(0 0 8px rgba(147, 51, 234, 0.6))'
+                      filter: 'drop-shadow(0 2px 6px rgba(147, 51, 234, 0.4))'
                     } : {}}
                   />
-                </div>
-                <span
-                  className={`text-[10px] font-semibold relative z-10 transition-all duration-300 ${
-                    isActive ? `bg-gradient-to-br ${item.gradient} bg-clip-text text-transparent` : 'text-gray-500'
+                </motion.div>
+
+                <motion.span
+                  className={`text-[10px] font-semibold relative z-10 transition-all duration-200 ${
+                    isActive ? `bg-gradient-to-br ${item.gradient} bg-clip-text text-transparent font-bold` : 'text-gray-500'
                   }`}
+                  animate={{
+                    opacity: isActive ? 1 : 0.85
+                  }}
                 >
                   {item.label}
-                </span>
+                </motion.span>
+
+                {/* Active indicator dot */}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeDot"
+                    className={`absolute -bottom-1 left-1/2 w-1 h-1 rounded-full bg-gradient-to-r ${item.gradient}`}
+                    style={{ x: '-50%' }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                  />
+                )}
               </motion.button>
             );
           })}
