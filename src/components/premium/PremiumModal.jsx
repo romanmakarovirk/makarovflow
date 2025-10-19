@@ -88,7 +88,7 @@ const PremiumModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="">
+    <Modal isOpen={isOpen} onClose={onClose} title="Premium">
       <div className="space-y-6">
         {/* Header */}
         <div className="text-center">
