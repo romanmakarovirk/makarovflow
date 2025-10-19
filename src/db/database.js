@@ -455,16 +455,20 @@ export const exportData = async () => {
   const entries = await journalEntries.getAll();
   const scheduleItems = await schedule.getAll();
   const homeworkItems = await homework.getAll();
+  const taskItems = await tasks.getAll();
   const settingsData = await settings.get();
+  const statsData = await userStats.get();
 
   return {
-    version: 1,
+    version: 3,
     exportedAt: new Date().toISOString(),
     data: {
       journal_entries: entries,
       schedule: scheduleItems,
       homework: homeworkItems,
-      settings: settingsData
+      tasks: taskItems,
+      settings: settingsData,
+      user_stats: statsData
     }
   };
 };
@@ -478,6 +482,7 @@ export const importData = async (jsonData) => {
     await db.journal_entries.clear();
     await db.schedule.clear();
     await db.homework.clear();
+    await db.tasks.clear();
 
     // Import data
     if (data.journal_entries) {
@@ -489,8 +494,14 @@ export const importData = async (jsonData) => {
     if (data.homework) {
       await db.homework.bulkAdd(data.homework);
     }
+    if (data.tasks) {
+      await db.tasks.bulkAdd(data.tasks);
+    }
     if (data.settings) {
       await db.settings.put(data.settings);
+    }
+    if (data.user_stats) {
+      await db.user_stats.put(data.user_stats);
     }
 
     return true;
