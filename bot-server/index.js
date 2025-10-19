@@ -1,10 +1,12 @@
 import { Bot, InlineKeyboard } from 'grammy';
 import http from 'http';
+import https from 'https';
 
 // Bot configuration from environment variables
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN || '8353631022:AAHWAts6QguP9--0S4eWxM1rb0Dr40Cmy2Y';
 const WEB_APP_URL = process.env.WEB_APP_URL || 'https://superlative-gelato-2ffbac.netlify.app';
 const PORT = process.env.PORT || 3000;
+const RENDER_URL = process.env.RENDER_EXTERNAL_URL || 'https://mindflow-bot-5hph.onrender.com';
 
 // Создаём бота
 const bot = new Bot(BOT_TOKEN);
@@ -67,4 +69,20 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`🌐 HTTP Server running on port ${PORT}`);
+  console.log(`🔄 Keep-alive enabled for ${RENDER_URL}`);
 });
+
+// Keep-alive функция для предотвращения засыпания на Render
+function keepAlive() {
+  https.get(RENDER_URL, (res) => {
+    console.log(`✅ Keep-alive ping: ${res.statusCode}`);
+  }).on('error', (err) => {
+    console.log('⚠️ Keep-alive ping failed:', err.message);
+  });
+}
+
+// Пингуем сервер каждые 10 минут (Render засыпает через 15 минут неактивности)
+setInterval(keepAlive, 10 * 60 * 1000);
+
+// Первый пинг через 1 минуту после запуска
+setTimeout(keepAlive, 60 * 1000);
