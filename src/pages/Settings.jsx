@@ -181,7 +181,7 @@ const Settings = () => {
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between py-2">
                 <span className="text-gray-400">Версия</span>
-                <span className="text-gray-300 font-medium">1.0.1</span>
+                <span className="text-gray-300 font-medium">1.0.2</span>
               </div>
               <div className="flex items-center justify-between py-2">
                 <span className="text-gray-400">Платформа</span>
