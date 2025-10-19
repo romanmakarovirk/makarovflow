@@ -7,8 +7,12 @@ import Card from '../components/ui/Card';
 import MultiStepCheckIn from '../components/journal/MultiStepCheckIn';
 import JournalCalendar from '../components/journal/JournalCalendar';
 import AIInsights from '../components/journal/AIInsights';
-import { journalEntries, userStats } from '../db/database';
+import ScheduleManager from '../components/study/ScheduleManager';
+import HomeworkManager from '../components/study/HomeworkManager';
+import GPACalculator from '../components/study/GPACalculator';
+import { journalEntries, userStats, schedule, homework } from '../db/database';
 import { calculateWeeklySummary } from '../utils/analytics';
+import { haptic } from '../utils/telegram';
 
 const Journal = () => {
   const { t } = useTranslation();
@@ -17,6 +21,11 @@ const Journal = () => {
   const [todayEntry, setTodayEntry] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [stats, setStats] = useState(null);
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [showHomework, setShowHomework] = useState(false);
+  const [showGPA, setShowGPA] = useState(false);
+  const [scheduleData, setScheduleData] = useState([]);
+  const [homeworkData, setHomeworkData] = useState([]);
 
   useEffect(() => {
     loadAll();
@@ -27,8 +36,21 @@ const Journal = () => {
       checkTodayEntry(),
       checkHasEntries(),
       loadAnalytics(),
-      loadStats()
+      loadStats(),
+      loadSchedule(),
+      loadHomework()
     ]);
+  };
+
+  const loadSchedule = async () => {
+    const today = new Date().getDay();
+    const items = await schedule.getByDay(today);
+    setScheduleData(items);
+  };
+
+  const loadHomework = async () => {
+    const items = await homework.getActive();
+    setHomeworkData(items.slice(0, 3));
   };
 
   const checkTodayEntry = async () => {
@@ -240,67 +262,82 @@ const Journal = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {/* Schedule Widget */}
-              <Card className="p-4 bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/20 hover:border-orange-500/40 transition-all cursor-pointer group">
+              <Card
+                onClick={() => { haptic.light(); setShowSchedule(true); }}
+                className="p-4 bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/20 hover:border-orange-500/40 transition-all cursor-pointer group"
+              >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 flex items-center justify-center">
                     <Calendar size={20} className="text-orange-400" />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-sm font-semibold text-white">Расписание</h3>
-                    <p className="text-xs text-gray-500">Сегодня</p>
+                    <p className="text-xs text-gray-500">
+                      {scheduleData.length > 0 ? `${scheduleData.length} урока` : 'Пусто'}
+                    </p>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-400">09:00</span>
-                    <span className="text-gray-300">Математика</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-400">10:30</span>
-                    <span className="text-gray-300">Физика</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-400">12:00</span>
-                    <span className="text-gray-300">История</span>
-                  </div>
+                  {scheduleData.length > 0 ? (
+                    scheduleData.slice(0, 3).map((item, idx) => (
+                      <div key={idx} className="flex items-center justify-between text-xs">
+                        <span className="text-gray-400">{item.startTime}</span>
+                        <span className="text-gray-300">{item.subject}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-gray-500 text-center py-2">Нет уроков на сегодня</p>
+                  )}
                 </div>
                 <div className="mt-3 pt-3 border-t border-gray-700/50">
-                  <p className="text-xs text-orange-400 font-medium">+ Добавить урок</p>
+                  <p className="text-xs text-orange-400 font-medium group-hover:text-orange-300">
+                    {scheduleData.length > 0 ? 'Управление' : '+ Добавить урок'}
+                  </p>
                 </div>
               </Card>
 
               {/* Homework Widget */}
-              <Card className="p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20 hover:border-blue-500/40 transition-all cursor-pointer group">
+              <Card
+                onClick={() => { haptic.light(); setShowHomework(true); }}
+                className="p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20 hover:border-blue-500/40 transition-all cursor-pointer group"
+              >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
                     <BookCheck size={20} className="text-blue-400" />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-sm font-semibold text-white">Домашка</h3>
-                    <p className="text-xs text-gray-500">3 задания</p>
+                    <p className="text-xs text-gray-500">
+                      {homeworkData.length > 0 ? `${homeworkData.length} задания` : 'Пусто'}
+                    </p>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <div className="flex items-start gap-2">
-                    <div className="w-4 h-4 rounded border border-gray-600 mt-0.5 flex-shrink-0"></div>
-                    <p className="text-xs text-gray-300 line-clamp-1">Решить задачи 12-15</p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <div className="w-4 h-4 rounded border border-gray-600 mt-0.5 flex-shrink-0"></div>
-                    <p className="text-xs text-gray-300 line-clamp-1">Написать эссе</p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <div className="w-4 h-4 rounded border border-gray-600 mt-0.5 flex-shrink-0"></div>
-                    <p className="text-xs text-gray-300 line-clamp-1">Прочитать главу 5</p>
-                  </div>
+                  {homeworkData.length > 0 ? (
+                    homeworkData.map((item, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <div className="w-4 h-4 rounded border border-gray-600 mt-0.5 flex-shrink-0"></div>
+                        <p className="text-xs text-gray-300 line-clamp-1">
+                          {item.subject}: {item.description || 'без описания'}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-gray-500 text-center py-2">Нет активных заданий</p>
+                  )}
                 </div>
                 <div className="mt-3 pt-3 border-t border-gray-700/50">
-                  <p className="text-xs text-blue-400 font-medium">+ Добавить задание</p>
+                  <p className="text-xs text-blue-400 font-medium group-hover:text-blue-300">
+                    {homeworkData.length > 0 ? 'Управление' : '+ Добавить задание'}
+                  </p>
                 </div>
               </Card>
 
               {/* Calculator Widget */}
-              <Card className="p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer group">
+              <Card
+                onClick={() => { haptic.light(); setShowGPA(true); }}
+                className="p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer group"
+              >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
                     <Calculator size={20} className="text-purple-400" />
@@ -312,28 +349,32 @@ const Journal = () => {
                 </div>
                 <div className="space-y-2">
                   <div className="p-2 bg-purple-500/10 rounded-lg">
-                    <p className="text-xs text-gray-400 mb-1">Средний балл</p>
-                    <p className="text-2xl font-bold text-purple-300">4.5</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="flex-1 p-2 bg-purple-500/5 rounded-lg text-center">
-                      <p className="text-xs text-gray-500">GPA</p>
-                      <p className="text-sm font-bold text-purple-400">3.8</p>
-                    </div>
-                    <div className="flex-1 p-2 bg-purple-500/5 rounded-lg text-center">
-                      <p className="text-xs text-gray-500">Оценок</p>
-                      <p className="text-sm font-bold text-purple-400">12</p>
-                    </div>
+                    <p className="text-xs text-gray-400 mb-1">Калькулятор оценок</p>
+                    <p className="text-sm font-medium text-purple-300">Нажми для расчёта</p>
                   </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-gray-700/50">
-                  <p className="text-xs text-purple-400 font-medium">Открыть</p>
+                  <p className="text-xs text-purple-400 font-medium group-hover:text-purple-300">Открыть калькулятор</p>
                 </div>
               </Card>
             </div>
           </motion.div>
         )}
       </div>
+
+      {/* Modals */}
+      <ScheduleManager
+        isOpen={showSchedule}
+        onClose={() => { setShowSchedule(false); loadSchedule(); }}
+      />
+      <HomeworkManager
+        isOpen={showHomework}
+        onClose={() => { setShowHomework(false); loadHomework(); }}
+      />
+      <GPACalculator
+        isOpen={showGPA}
+        onClose={() => setShowGPA(false)}
+      />
     </motion.div>
   );
 };

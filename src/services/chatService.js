@@ -1,11 +1,140 @@
 /**
  * AI Chat Service for MakarovFlow
- * Uses Hugging Face Inference API with free models
+ * Smart context-aware responses
  */
 
 import { journalEntries, tasks, homework, settings } from '../db/database';
 
-const HF_API_URL = 'https://api-inference.huggingface.co/models';
+/**
+ * Parse context string into structured data
+ */
+const parseContext = (contextString) => {
+  const lines = contextString.split('\n');
+  const data = {
+    hasMoodData: false,
+    avgMood: 0,
+    avgEnergy: 0,
+    avgSleep: 0,
+    latestMood: 0,
+    latestEnergy: 0,
+    latestSleep: 0,
+    tasksCount: 0,
+    homeworkCount: 0
+  };
+
+  lines.forEach(line => {
+    if (line.includes('Настроение:')) {
+      const match = line.match(/(\d+)\/10/);
+      if (match) {
+        data.latestMood = parseInt(match[1]);
+        data.hasMoodData = true;
+      }
+    }
+    if (line.includes('Энергия:')) {
+      const match = line.match(/(\d+)%/);
+      if (match) data.latestEnergy = parseInt(match[1]);
+    }
+    if (line.includes('Сон:')) {
+      const match = line.match(/(\d+\.?\d*) часов/);
+      if (match) data.latestSleep = parseFloat(match[1]);
+    }
+    if (line.includes('Среднее настроение:')) {
+      const match = line.match(/(\d+\.?\d*)\/10/);
+      if (match) data.avgMood = parseFloat(match[1]);
+    }
+    if (line.includes('Средняя энергия:')) {
+      const match = line.match(/(\d+)%/);
+      if (match) data.avgEnergy = parseInt(match[1]);
+    }
+    if (line.includes('Средний сон:')) {
+      const match = line.match(/(\d+\.?\d*) часов/);
+      if (match) data.avgSleep = parseFloat(match[1]);
+    }
+    if (line.includes('Задачи на сегодня')) {
+      const match = line.match(/\((\d+)\)/);
+      if (match) data.tasksCount = parseInt(match[1]);
+    }
+    if (line.includes('Активные домашние задания')) {
+      const match = line.match(/\((\d+)\)/);
+      if (match) data.homeworkCount = parseInt(match[1]);
+    }
+  });
+
+  return data;
+};
+
+/**
+ * Generate personalized mood analysis
+ */
+const generateMoodAnalysis = (data) => {
+  let response = '📊 **Вот твоя статистика:**\n\n';
+
+  if (data.hasMoodData) {
+    // Latest status
+    response += `**Последнее состояние:**\n`;
+    response += `• Настроение: ${data.latestMood}/10 ${getMoodEmoji(data.latestMood)}\n`;
+    response += `• Энергия: ${data.latestEnergy}% ${getEnergyEmoji(data.latestEnergy)}\n`;
+    response += `• Сон: ${data.latestSleep}ч ${getSleepEmoji(data.latestSleep)}\n\n`;
+
+    // Average
+    if (data.avgMood > 0) {
+      response += `**Средние показатели (неделя):**\n`;
+      response += `• Настроение: ${data.avgMood.toFixed(1)}/10\n`;
+      response += `• Энергия: ${data.avgEnergy}%\n`;
+      response += `• Сон: ${data.avgSleep.toFixed(1)}ч\n\n`;
+    }
+
+    // Analysis
+    response += `**Рекомендации:**\n`;
+
+    if (data.avgMood < 5) {
+      response += '❤️ Твоё настроение последнюю неделю было низким. Попробуй больше гулять, общаться с друзьями, заниматься любимыми делами.\n';
+    } else if (data.avgMood < 7) {
+      response += '💛 Неплохо, но есть куда расти! Добавь больше радости в каждый день.\n';
+    } else {
+      response += '💚 Отлично! Ты в хорошем настроении. Продолжай в том же духе!\n';
+    }
+
+    if (data.avgEnergy < 40) {
+      response += '⚡ Низкая энергия. Высыпайся (7-8ч), двигайся больше, пей воду.\n';
+    }
+
+    if (data.avgSleep < 7) {
+      response += '😴 Ты мало спишь! Старайся спать минимум 7-8 часов.\n';
+    } else if (data.avgSleep > 9) {
+      response += '🛏 Много сна — тоже не очень. 7-8 часов оптимально.\n';
+    }
+  }
+
+  if (data.tasksCount > 0) {
+    response += `\n📝 У тебя ${data.tasksCount} задач на сегодня. Не забудь их выполнить!`;
+  }
+
+  if (data.homeworkCount > 0) {
+    response += `\n📚 ${data.homeworkCount} домашних заданий ждут тебя.`;
+  }
+
+  return response;
+};
+
+const getMoodEmoji = (mood) => {
+  if (mood >= 8) return '😊';
+  if (mood >= 6) return '🙂';
+  if (mood >= 4) return '😐';
+  return '😔';
+};
+
+const getEnergyEmoji = (energy) => {
+  if (energy >= 70) return '⚡';
+  if (energy >= 40) return '🔋';
+  return '🪫';
+};
+
+const getSleepEmoji = (sleep) => {
+  if (sleep >= 7 && sleep <= 9) return '✅';
+  if (sleep < 6) return '⚠️';
+  return '💤';
+};
 
 /**
  * Get context from user's data
@@ -88,10 +217,18 @@ export const sendMessage = async (userMessage, conversationHistory = []) => {
 };
 
 /**
- * Generate fallback response based on keywords
+ * Generate smart response based on keywords and context
  */
 const generateFallbackResponse = (userMessage, context) => {
   const lowerMessage = userMessage.toLowerCase();
+
+  // Extract context data
+  const contextData = parseContext(context);
+
+  // Analyze mood trends
+  if (contextData.hasMoodData && (lowerMessage.includes('анализ') || lowerMessage.includes('статистик') || lowerMessage.includes('как дела'))) {
+    return generateMoodAnalysis(contextData);
+  }
 
   // Greeting
   if (lowerMessage.match(/^(привет|здравствуй|hi|hello|hey)/)) {
