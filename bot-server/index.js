@@ -52,7 +52,7 @@ bot.start({
 
 // Обработка ошибок
 bot.catch((err) => {
-  console.error('❌ Ошибка:', err);
+  console.error('❌ Ошибка бота:', err);
 });
 
 // Создаём HTTP сервер для Render (требуется открытый порт)
