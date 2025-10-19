@@ -4,7 +4,7 @@ import https from 'https';
 
 // Bot configuration from environment variables
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN || '8353631022:AAHWAts6QguP9--0S4eWxM1rb0Dr40Cmy2Y';
-const WEB_APP_URL = process.env.WEB_APP_URL || 'https://superlative-gelato-2ffbac.netlify.app';
+const WEB_APP_URL = process.env.WEB_APP_URL || 'https://makarovflow.vercel.app';
 const PORT = process.env.PORT || 3000;
 const RENDER_URL = process.env.RENDER_EXTERNAL_URL || 'https://mindflow-bot-5hph.onrender.com';
 

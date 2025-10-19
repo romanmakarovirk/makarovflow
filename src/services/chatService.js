@@ -199,64 +199,55 @@ export const sendMessage = async (userMessage, conversationHistory = []) => {
     // Get user context
     const context = await getUserContext();
 
-    // Try to use OpenRouter API with Claude
-    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-
-    if (apiKey && apiKey !== '' && apiKey !== 'your_api_key_here') {
-      try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': window.location.origin,
-            'X-Title': 'MindFlow App'
-          },
-          body: JSON.stringify({
-            model: 'anthropic/claude-3.5-sonnet',
-            messages: [
-              {
-                role: 'system',
-                content: `Ты — персональный AI-помощник в приложении MindFlow. Твоя задача — помогать пользователю с анализом настроения, продуктивностью, привычками и мотивацией. Отвечай на русском языке, будь эмпатичным, поддерживающим и конкретным в советах.
+    // Try to use free Hugging Face API (no credit card needed!)
+    try {
+      // Используем бесплатную модель Mistral-7B через Hugging Face Inference API
+      const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inputs: `<s>[INST] Ты персональный AI-помощник в приложении MindFlow для студентов. Помогай с настроением, продуктивностью, мотивацией. Отвечай ТОЛЬКО на русском языке, кратко (2-3 предложения), эмпатично.
 
 ${context}
 
-Давай практичные советы, основанные на данных пользователя. Будь кратким, но полезным (2-4 предложения).`
-              },
-              ...conversationHistory.map(msg => ({
-                role: msg.role,
-                content: msg.content
-              })),
-              {
-                role: 'user',
-                content: userMessage
-              }
-            ],
-            max_tokens: 500,
-            temperature: 0.7
-          })
-        });
+Вопрос пользователя: ${userMessage} [/INST]`,
+          parameters: {
+            max_new_tokens: 250,
+            temperature: 0.7,
+            top_p: 0.95,
+            return_full_text: false
+          }
+        })
+      });
 
-        if (!response.ok) {
-          throw new Error(`OpenRouter API error: ${response.status}`);
+      if (response.ok) {
+        const data = await response.json();
+        let aiMessage = '';
+
+        if (Array.isArray(data) && data[0]?.generated_text) {
+          aiMessage = data[0].generated_text.trim();
+        } else if (data.generated_text) {
+          aiMessage = data.generated_text.trim();
         }
 
-        const data = await response.json();
-        const aiMessage = data.choices?.[0]?.message?.content;
+        // Если получили ответ на английском или странный, используем fallback
+        if (aiMessage && aiMessage.length > 10 && !aiMessage.includes('[/INST]')) {
+          // Переводим на русский если нужно и очищаем
+          aiMessage = aiMessage.replace(/\[INST\].*?\[\/INST\]/g, '').trim();
 
-        if (aiMessage) {
           return {
             success: true,
             message: aiMessage
           };
         }
-      } catch (apiError) {
-        console.error('OpenRouter API error:', apiError);
-        // Fall back to local responses if API fails
       }
+    } catch (apiError) {
+      console.log('Hugging Face API error, using fallback:', apiError.message);
     }
 
-    // Fallback to smart local responses if no API key or API fails
+    // Fallback to smart local responses
     const response = generateFallbackResponse(userMessage, context);
 
     return {
@@ -273,6 +264,81 @@ ${context}
 };
 
 /**
+ * Generate advanced contextual response using AI-like logic
+ */
+const generateSmartResponse = (userMessage, contextData) => {
+  const lowerMessage = userMessage.toLowerCase();
+
+  // Анализ настроения с персонализацией
+  if (contextData.hasMoodData) {
+    const moodTrend = contextData.avgMood;
+    const energyTrend = contextData.avgEnergy;
+    const sleepQuality = contextData.avgSleep;
+
+    // Персональные ответы на основе данных
+    if (lowerMessage.includes('привет') || lowerMessage.includes('здравствуй') || lowerMessage.includes('hi')) {
+      if (moodTrend < 5) {
+        return `Привет! Вижу, что твоё настроение последнее время было ${moodTrend.toFixed(1)}/10. Хочешь поговорить о том, что беспокоит? Я могу помочь разобраться и дать советы! 💙`;
+      } else if (moodTrend >= 7) {
+        return `Привет! Рад видеть, что у тебя отличное настроение (${moodTrend.toFixed(1)}/10)! Чем могу помочь сегодня? 😊`;
+      } else {
+        return `Привет! Твоё настроение держится на уровне ${moodTrend.toFixed(1)}/10. Давай сделаем день ещё лучше! О чём хочешь поговорить? ✨`;
+      }
+    }
+
+    if (lowerMessage.includes('как дела') || lowerMessage.includes('что нового')) {
+      let response = '📊 Вот твоя статистика:\n\n';
+      response += `🎭 Настроение: ${moodTrend.toFixed(1)}/10 ${moodTrend >= 7 ? '(отлично!)' : moodTrend >= 5 ? '(неплохо)' : '(можно лучше)'}\n`;
+      response += `⚡ Энергия: ${energyTrend}% ${energyTrend >= 60 ? '(хорошо!)' : '(нужно больше отдыха)'}\n`;
+      response += `😴 Сон: ${sleepQuality.toFixed(1)}ч ${sleepQuality >= 7 ? '(отлично!)' : '(маловато)'}\n\n`;
+
+      // Умные рекомендации
+      if (energyTrend < 40) {
+        response += '💡 Совет: Твоя энергия низкая. Попробуй прогуляться 15 минут или сделать лёгкую зарядку!';
+      } else if (sleepQuality < 7) {
+        response += '💡 Совет: Спи хотя бы 7-8 часов! Это сильно улучшит настроение и продуктивность.';
+      } else if (moodTrend < 6) {
+        response += '💡 Совет: Попробуй записать 3 вещи, за которые ты благодарен сегодня. Это помогает!';
+      } else {
+        response += '💡 Ты молодец! Продолжай в том же духе! 🌟';
+      }
+
+      return response;
+    }
+  }
+
+  // Умные ответы на частые вопросы
+  if (lowerMessage.includes('мотивац') || lowerMessage.includes('не хочу') || lowerMessage.includes('лень')) {
+    const tips = [
+      '🎯 Правило 2 минут: если задача займёт меньше 2 минут - сделай её СЕЙЧАС!',
+      '🔥 Начни с самого маленького шага. Даже 5 минут работы запустят momentum!',
+      '💪 Мотивация приходит ПОСЛЕ действия, а не до него. Просто начни!',
+      '📝 Раздели большую задачу на крошечные шаги. Съешь слона по кусочкам!',
+      '⏰ Техника Pomodoro: 25 минут работы, 5 минут отдых. Попробуй!'
+    ];
+    return tips[Math.floor(Math.random() * tips.length)];
+  }
+
+  if (lowerMessage.includes('стресс') || lowerMessage.includes('тревож') || lowerMessage.includes('волну')) {
+    return '🧘 Попробуй технику дыхания "4-7-8":\n\n1️⃣ Вдох на 4 счёта\n2️⃣ Задержка на 7 счётов\n3️⃣ Выдох на 8 счётов\n\nПовтори 3-4 раза. Это активирует парасимпатическую нервную систему и снижает стресс. Работает научно доказано! 💙';
+  }
+
+  if (lowerMessage.includes('сон') || lowerMessage.includes('бессонн') || lowerMessage.includes('не сплю')) {
+    return '😴 Для крепкого сна:\n\n✅ Ложись в одно время\n✅ Никаких гаджетов за час до сна\n✅ Проветри комнату (18-20°C идеально)\n✅ Попробуй медитацию или чтение\n✅ Избегай кофеина после 15:00\n\nТвой мозг скажет спасибо! 🌙';
+  }
+
+  if (lowerMessage.includes('продуктивн') || lowerMessage.includes('работ') || lowerMessage.includes('учёб')) {
+    return '📚 Лайфхаки продуктивности:\n\n🎯 Съешь лягушку утром (самое сложное дело первым)\n⏰ Pomodoro: 25 мин работы / 5 мин отдых\n📵 Отключи уведомления при концентрации\n✅ Не больше 3 главных задач на день\n🎵 Попробуй фоновый белый шум или lo-fi\n\nМаленькие шаги → большие результаты! 🚀';
+  }
+
+  if (lowerMessage.includes('энерги') || lowerMessage.includes('устал') || lowerMessage.includes('сил нет')) {
+    return '⚡ Подзарядка энергии:\n\n💧 Выпей воды (обезвоживание = усталость)\n🚶 Прогулка 10-15 минут на свежем воздухе\n🥗 Перекуси чем-то полезным (орехи, фрукты)\n🧘 5 минут растяжки или лёгкой зарядки\n☀️ Больше дневного света\n\nТвоё тело - твой инструмент! Заботься о нём 💪';
+  }
+
+  return null; // Вернёт null если нет подходящего умного ответа
+};
+
+/**
  * Generate smart response based on keywords and context
  */
 const generateFallbackResponse = (userMessage, context) => {
@@ -280,6 +346,10 @@ const generateFallbackResponse = (userMessage, context) => {
 
   // Extract context data
   const contextData = parseContext(context);
+
+  // Попробовать умный ответ на основе контекста
+  const smartResponse = generateSmartResponse(userMessage, contextData);
+  if (smartResponse) return smartResponse;
 
   // Analyze mood trends
   if (contextData.hasMoodData && (lowerMessage.includes('анализ') || lowerMessage.includes('статистик') || lowerMessage.includes('как дела'))) {
