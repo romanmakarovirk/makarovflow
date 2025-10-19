@@ -56,18 +56,18 @@ const Navigation = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-white/[0.05] to-transparent rounded-[24px]" />
                   </motion.div>
                 )}
-                <Icon
-                  size={24}
-                  strokeWidth={isActive ? 2.5 : 2}
-                  className={`relative z-10 transition-all duration-300 ${
-                    isActive
-                      ? `bg-gradient-to-br ${item.gradient} bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(147,51,234,0.6)]`
-                      : 'text-gray-500'
-                  }`}
-                  style={isActive ? {
-                    filter: 'drop-shadow(0 0 8px rgba(147, 51, 234, 0.4))'
-                  } : {}}
-                />
+                <div className="relative z-10">
+                  <Icon
+                    size={24}
+                    strokeWidth={isActive ? 2.5 : 2}
+                    className={`transition-all duration-300 ${
+                      isActive ? 'text-white' : 'text-gray-500'
+                    }`}
+                    style={isActive ? {
+                      filter: 'drop-shadow(0 0 8px rgba(147, 51, 234, 0.6))'
+                    } : {}}
+                  />
+                </div>
                 <span
                   className={`text-[10px] font-semibold relative z-10 transition-all duration-300 ${
                     isActive ? `bg-gradient-to-br ${item.gradient} bg-clip-text text-transparent` : 'text-gray-500'
