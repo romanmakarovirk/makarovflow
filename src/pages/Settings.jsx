@@ -181,7 +181,7 @@ const Settings = () => {
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between py-2">
                 <span className="text-gray-400">Версия</span>
-                <span className="text-gray-300 font-medium">1.0.0</span>
+                <span className="text-gray-300 font-medium">1.0.1</span>
               </div>
               <div className="flex items-center justify-between py-2">
                 <span className="text-gray-400">Платформа</span>
@@ -189,7 +189,7 @@ const Settings = () => {
               </div>
               <div className="border-t border-gray-700/50 pt-3 mt-3">
                 <p className="text-gray-500 text-xs text-center">
-                  Made with ❤️ for Roman Makarov
+                  Made by Roman Makarov
                 </p>
               </div>
             </div>
