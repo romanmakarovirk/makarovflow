@@ -142,7 +142,7 @@ const getSleepEmoji = (sleep) => {
 const getUserContext = async () => {
   try {
     const [recentEntries, recentTasks, recentHomework, userSettings] = await Promise.all([
-      journalEntries.getLastN(7),
+      journalEntries.getLastN(14), // Увеличил до 14 дней для прогноза
       tasks.getToday(),
       homework.getActive(),
       settings.get()
@@ -166,6 +166,29 @@ const getUserContext = async () => {
 - Среднее настроение: ${avgMood.toFixed(1)}/10
 - Средняя энергия: ${avgEnergy.toFixed(0)}%
 - Средний сон: ${avgSleep.toFixed(1)} часов\n`;
+
+      // 🔮 ADD PREDICTION TO CONTEXT
+      if (recentEntries.length >= 7) {
+        const { predictTomorrowMood } = await import('./aiService');
+        const prediction = predictTomorrowMood(recentEntries);
+        if (prediction) {
+          context += `\nПрогноз настроения на завтра:
+- Прогнозируемое настроение: ${prediction.predictedMood}/10 (${prediction.trendText})
+- Тренд: ${prediction.trendIcon}
+- Уверенность прогноза: ${prediction.confidence}%\n`;
+        }
+      }
+
+      // 📊 ADD TASK CORRELATION TO CONTEXT
+      if (recentEntries.length >= 7) {
+        const { analyzeTaskMoodCorrelation } = await import('./aiService');
+        const correlation = await analyzeTaskMoodCorrelation(recentEntries);
+        if (correlation && correlation.correlation) {
+          context += `\nСвязь задач и настроения:
+- Корреляция: ${correlation.correlation > 0.5 ? 'положительная' : correlation.correlation < -0.3 ? 'отрицательная' : 'нейтральная'}
+- Средний процент выполнения задач: ${correlation.avgCompletionRate}%\n`;
+        }
+      }
     }
 
     // Today's tasks
@@ -307,6 +330,76 @@ const generateSmartResponse = (userMessage, contextData) => {
     }
   }
 
+  // 🔮 PREDICTION QUESTIONS
+  if (lowerMessage.includes('прогноз') || lowerMessage.includes('завтра') || lowerMessage.includes('предскаж')) {
+    if (contextData.hasMoodData) {
+      // Get prediction from context
+      const lines = context.split('\n');
+      const predictionLine = lines.find(l => l.includes('Прогнозируемое настроение'));
+      if (predictionLine) {
+        const match = predictionLine.match(/(\d+\.?\d*)\/10 \((.+?)\)/);
+        if (match) {
+          const score = parseFloat(match[1]);
+          const trend = match[2];
+
+          let response = `🔮 **Прогноз на завтра:**\n\n`;
+          response += `Твоё настроение завтра будет **${trend}** (${score}/10).\n\n`;
+
+          if (score < contextData.latestMood - 0.5) {
+            response += `📉 Я вижу возможное снижение. **Что делать:**\n`;
+            response += `• Ложись спать пораньше сегодня\n`;
+            response += `• Запланируй что-то приятное на утро\n`;
+            response += `• Не перегружай себя задачами завтра\n`;
+          } else if (score > contextData.latestMood + 0.5) {
+            response += `📈 Отличные новости! **Как использовать:**\n`;
+            response += `• Идеальный день для сложных задач!\n`;
+            response += `• Займись тем, что откладывал\n`;
+            response += `• Продолжай в том же духе с режимом\n`;
+          } else {
+            response += `➡️ Стабильное состояние. Продолжай следить за режимом сна и активности!`;
+          }
+
+          return response;
+        }
+      }
+    }
+    return '🔮 Для точного прогноза мне нужно минимум 7 дней записей в дневнике. Продолжай записывать своё состояние каждый день!';
+  }
+
+  // 📊 TASK CORRELATION QUESTIONS
+  if (lowerMessage.includes('задач') && (lowerMessage.includes('влия') || lowerMessage.includes('связ') || lowerMessage.includes('настроен'))) {
+    const lines = context.split('\n');
+    const correlationLine = lines.find(l => l.includes('Корреляция:'));
+    const completionLine = lines.find(l => l.includes('Средний процент выполнения'));
+
+    if (correlationLine && completionLine) {
+      const isPositive = correlationLine.includes('положительная');
+      const isNegative = correlationLine.includes('отрицательная');
+      const completionMatch = completionLine.match(/(\d+)%/);
+      const completion = completionMatch ? completionMatch[1] : '?';
+
+      let response = `📊 **Анализ задач и настроения:**\n\n`;
+
+      if (isPositive) {
+        response += `✅ Выполнение задач **положительно влияет** на твоё настроение!\n\n`;
+        response += `Когда ты выполняешь задачи, настроение становится лучше. Ты в среднем выполняешь **${completion}%** задач.\n\n`;
+        response += `**Совет:** Начинай день с маленькой задачи, чтобы запустить позитивный momentum!`;
+      } else if (isNegative) {
+        response += `⚠️ Похоже, большое количество задач **снижает** настроение.\n\n`;
+        response += `Возможно, ты берёшь слишком много на себя. Средний процент выполнения: **${completion}%**.\n\n`;
+        response += `**Совет:** Уменьши количество задач на день. Лучше 3 выполненных, чем 10 незавершённых!`;
+      } else {
+        response += `➡️ Связь между задачами и настроением **нейтральная**.\n\n`;
+        response += `Твой процент выполнения: **${completion}%**. Задачи не сильно влияют на настроение.\n\n`;
+        response += `**Совет:** Фокусируйся на задачах, которые тебе действительно интересны!`;
+      }
+
+      return response;
+    }
+
+    return '📊 Для анализа связи задач и настроения нужно больше данных. Заполняй дневник и отмечай выполненные задачи!';
+  }
+
   // Умные ответы на частые вопросы
   if (lowerMessage.includes('мотивац') || lowerMessage.includes('не хочу') || lowerMessage.includes('лень')) {
     const tips = [
@@ -431,11 +524,21 @@ const generateFallbackResponse = (userMessage, context) => {
 export const getSuggestedQuestions = async () => {
   try {
     const [recentEntries, todayTasks] = await Promise.all([
-      journalEntries.getLastN(7),
+      journalEntries.getLastN(14),
       tasks.getToday()
     ]);
 
     const suggestions = [];
+
+    // 🔮 ALWAYS SHOW PREDICTION if enough data
+    if (recentEntries.length >= 7) {
+      suggestions.push('Какой прогноз настроения на завтра?');
+    }
+
+    // 📊 SHOW TASK CORRELATION if has tasks and entries
+    if (recentEntries.length >= 7 && todayTasks.length > 0) {
+      suggestions.push('Как задачи влияют на моё настроение?');
+    }
 
     // If low mood recently
     if (recentEntries.length > 0) {
@@ -453,15 +556,17 @@ export const getSuggestedQuestions = async () => {
     }
 
     // Always available
-    suggestions.push('Как улучшить качество сна?');
-    suggestions.push('Какие привычки помогут мне?');
+    if (suggestions.length < 4) {
+      suggestions.push('Как улучшить качество сна?');
+      suggestions.push('Какие привычки помогут мне?');
+    }
 
     return suggestions.slice(0, 4);
   } catch (error) {
     return [
-      'Как улучшить настроение?',
+      'Какой прогноз настроения на завтра?',
+      'Как задачи влияют на моё настроение?',
       'Как быть продуктивнее?',
-      'Что делать при упадке сил?',
       'Как улучшить качество сна?'
     ];
   }
