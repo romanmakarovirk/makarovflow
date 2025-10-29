@@ -29,7 +29,7 @@ const Navigation = () => {
 
   return (
     // Telegram-style Liquid Glass Navigation Bar
-    <nav className="fixed bottom-0 left-0 right-0 z-50 px-3 pb-7 pointer-events-none">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 px-3 pb-7 pointer-events-none will-change-transform">
       {/* Outer glow effect - создает мягкое свечение вокруг панели */}
       <div
         className="absolute inset-0 blur-xl opacity-30 pointer-events-none"
@@ -59,7 +59,11 @@ const Navigation = () => {
             inset 0 -1px 0 rgba(0, 0, 0, 0.3)
           `,
           // Тонкая граница для эффекта стекла
-          border: '0.5px solid rgba(255, 255, 255, 0.1)'
+          border: '0.5px solid rgba(255, 255, 255, 0.1)',
+          // Hardware acceleration fix для анимации
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden'
         }}
       >
         {/* Верхнее отражение света - как на стекле */}

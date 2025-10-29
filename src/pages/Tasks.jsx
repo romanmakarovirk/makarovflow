@@ -157,32 +157,35 @@ const Tasks = () => {
               className="mb-4 overflow-hidden"
             >
               <div
-                className="rounded-xl p-3 flex items-center gap-3"
+                className="rounded-xl p-3 flex flex-col gap-3"
                 style={{ background: '#2C2C2E' }}
               >
-                {/* Things 3 style - чекбокс слева */}
-                <div className="w-5 h-5 rounded-full border-2 border-gray-600" />
+                {/* Верхняя часть - чекбокс и поле ввода */}
+                <div className="flex items-center gap-3">
+                  {/* Things 3 style - чекбокс слева */}
+                  <div className="w-5 h-5 rounded-full border-2 border-gray-600 flex-shrink-0" />
 
-                {/* Поле ввода */}
-                <input
-                  type="text"
-                  value={newTaskTitle}
-                  onChange={(e) => setNewTaskTitle(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') handleAddTask();
-                    if (e.key === 'Escape') setShowAddTask(false);
-                  }}
-                  placeholder="Новая задача"
-                  className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-[15px]"
-                  autoFocus
-                />
+                  {/* Поле ввода */}
+                  <input
+                    type="text"
+                    value={newTaskTitle}
+                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') handleAddTask();
+                      if (e.key === 'Escape') setShowAddTask(false);
+                    }}
+                    placeholder="Новая задача"
+                    className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-[15px]"
+                    autoFocus
+                  />
+                </div>
 
-                {/* Кнопки действий */}
-                <div className="flex gap-2">
+                {/* Кнопки действий - отдельной строкой снизу */}
+                <div className="flex gap-2 justify-end">
                   <motion.button
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setShowAddTask(false)}
-                    className="px-3 py-1 rounded-lg text-sm text-gray-400"
+                    className="px-4 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-700/30 transition-colors"
                   >
                     Отмена
                   </motion.button>
@@ -190,7 +193,7 @@ const Tasks = () => {
                     whileTap={{ scale: 0.9 }}
                     onClick={handleAddTask}
                     disabled={!newTaskTitle.trim()}
-                    className="px-3 py-1 rounded-lg text-sm text-white disabled:opacity-40"
+                    className="px-4 py-2 rounded-lg text-sm text-white disabled:opacity-40 disabled:cursor-not-allowed shadow-lg"
                     style={{ background: currentListData?.color }}
                   >
                     Добавить
