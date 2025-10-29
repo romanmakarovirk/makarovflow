@@ -3,15 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import PremiumModal from '../components/premium/PremiumModal';
 import { useStore } from '../store/useStore';
 import { exportData, clearAllData } from '../db/database';
-import { Globe, Download, Trash2, Crown, ChevronRight } from 'lucide-react';
+import { Globe, Download, Trash2, ChevronRight } from 'lucide-react';
 
 const Settings = () => {
   const { t, i18n } = useTranslation();
   const { language, setLanguage, showToast } = useStore();
-  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const handleLanguageChange = async (newLang) => {
     await setLanguage(newLang);
@@ -56,37 +54,6 @@ const Settings = () => {
         <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-rose-500 bg-clip-text text-transparent tracking-tight">
           Настройки
         </h1>
-
-        {/* Premium Section */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
-        >
-          <Card className="p-6 bg-gradient-to-br from-yellow-500/20 via-orange-500/15 to-pink-500/20 border-yellow-500/30 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 via-transparent to-pink-500/5" />
-            <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/10 rounded-full blur-3xl" />
-
-            <div className="relative flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <Crown className="text-yellow-400" size={24} />
-                  <h2 className="text-xl font-bold text-yellow-400">Premium</h2>
-                </div>
-                <p className="text-gray-300 text-sm mb-4">
-                  Безлимитный AI помощник, расширенная аналитика и многое другое
-                </p>
-                <Button
-                  variant="primary"
-                  onClick={() => setShowPremiumModal(true)}
-                  className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
-                >
-                  Попробовать Premium
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
 
         {/* Language */}
         <motion.div
@@ -196,11 +163,6 @@ const Settings = () => {
           </Card>
         </motion.div>
 
-        {/* Premium Modal */}
-        <PremiumModal
-          isOpen={showPremiumModal}
-          onClose={() => setShowPremiumModal(false)}
-        />
       </div>
     </motion.div>
   );
