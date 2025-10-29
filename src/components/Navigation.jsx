@@ -90,27 +90,23 @@ const Navigation = () => {
                 transition={{ duration: 0.15 }}
               >
                 {/* Активный фон - pill-образная форма (как в iOS 18) */}
-                <AnimatePresence>
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeTab"
-                      className="absolute inset-0 rounded-[20px]"
-                      style={{
-                        // Темный округлый фон для активной вкладки
-                        background: 'rgba(60, 60, 67, 0.6)',
-                        boxShadow: 'inset 0 0 0 0.5px rgba(255, 255, 255, 0.08)'
-                      }}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      transition={{
-                        type: 'spring',
-                        stiffness: 400,
-                        damping: 30
-                      }}
-                    />
-                  )}
-                </AnimatePresence>
+                {isActive && (
+                  <motion.div
+                    className="absolute inset-0 rounded-[20px]"
+                    style={{
+                      // Темный округлый фон для активной вкладки
+                      background: 'rgba(60, 60, 67, 0.6)',
+                      boxShadow: 'inset 0 0 0 0.5px rgba(255, 255, 255, 0.08)'
+                    }}
+                    initial={{ opacity: 0, scale: 0.85 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.85 }}
+                    transition={{
+                      duration: 0.2,
+                      ease: 'easeInOut'
+                    }}
+                  />
+                )}
 
                 {/* Icon - крупнее чем раньше */}
                 <motion.div
