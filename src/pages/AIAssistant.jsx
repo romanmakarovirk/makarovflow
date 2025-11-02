@@ -84,7 +84,16 @@ const AIAssistant = () => {
       return;
     }
 
-    const userMessage = text.trim();
+    // Validate and sanitize message
+    const { validateAIMessage } = await import('../utils/validation');
+    const validation = validateAIMessage(text.trim());
+    
+    if (!validation.isValid) {
+      showToast(validation.errors[0], 'warning');
+      return;
+    }
+
+    const userMessage = validation.sanitized;
     setInput('');
     haptic.light();
 

@@ -3,10 +3,17 @@ import http from 'http';
 import https from 'https';
 
 // Bot configuration from environment variables
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN || '8353631022:AAHWAts6QguP9--0S4eWxM1rb0Dr40Cmy2Y';
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN;
 const WEB_APP_URL = process.env.WEB_APP_URL || 'https://makarovflow.vercel.app';
 const PORT = process.env.PORT || 3000;
 const RENDER_URL = process.env.RENDER_EXTERNAL_URL || 'https://mindflow-bot-5hph.onrender.com';
+
+// Validate required environment variables
+if (!BOT_TOKEN) {
+  console.error('❌ ERROR: TELEGRAM_BOT_TOKEN is required!');
+  console.error('Please set TELEGRAM_BOT_TOKEN environment variable.');
+  process.exit(1);
+}
 
 // Создаём бота
 const bot = new Bot(BOT_TOKEN);

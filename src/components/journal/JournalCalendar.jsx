@@ -15,13 +15,29 @@ const JournalCalendar = ({ onDateSelect }) => {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    loadEntries();
-  }, [currentDate]);
+    let cancelled = false;
 
-  const loadEntries = async () => {
-    const allEntries = await journalEntries.getAll();
-    setEntries(allEntries);
-  };
+    const loadEntries = async () => {
+      // Calculate date range for current month to optimize query
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const startDate = new Date(year, month, 1).toISOString().split('T')[0];
+      const endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+      
+      const monthEntries = await journalEntries.getByDateRange(startDate, endDate);
+      
+      if (!cancelled) {
+        setEntries(monthEntries);
+      }
+    };
+
+    loadEntries();
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      cancelled = true;
+    };
+  }, [currentDate]);
 
   const getDaysInMonth = (date) => {
     const year = date.getFullYear();
