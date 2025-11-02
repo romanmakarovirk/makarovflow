@@ -289,7 +289,7 @@ ${context}
 /**
  * Generate advanced contextual response using AI-like logic
  */
-const generateSmartResponse = (userMessage, contextData) => {
+const generateSmartResponse = (userMessage, contextData, contextString = '') => {
   const lowerMessage = userMessage.toLowerCase();
 
   // Анализ настроения с персонализацией
@@ -332,9 +332,9 @@ const generateSmartResponse = (userMessage, contextData) => {
 
   // 🔮 PREDICTION QUESTIONS
   if (lowerMessage.includes('прогноз') || lowerMessage.includes('завтра') || lowerMessage.includes('предскаж')) {
-    if (contextData.hasMoodData) {
+    if (contextData.hasMoodData && contextString) {
       // Get prediction from context
-      const lines = context.split('\n');
+      const lines = contextString.split('\n');
       const predictionLine = lines.find(l => l.includes('Прогнозируемое настроение'));
       if (predictionLine) {
         const match = predictionLine.match(/(\d+\.?\d*)\/10 \((.+?)\)/);
@@ -368,7 +368,8 @@ const generateSmartResponse = (userMessage, contextData) => {
 
   // 📊 TASK CORRELATION QUESTIONS
   if (lowerMessage.includes('задач') && (lowerMessage.includes('влия') || lowerMessage.includes('связ') || lowerMessage.includes('настроен'))) {
-    const lines = context.split('\n');
+    if (!contextString) return null;
+    const lines = contextString.split('\n');
     const correlationLine = lines.find(l => l.includes('Корреляция:'));
     const completionLine = lines.find(l => l.includes('Средний процент выполнения'));
 
@@ -441,7 +442,7 @@ const generateFallbackResponse = (userMessage, context) => {
   const contextData = parseContext(context);
 
   // Попробовать умный ответ на основе контекста
-  const smartResponse = generateSmartResponse(userMessage, contextData);
+  const smartResponse = generateSmartResponse(userMessage, contextData, context);
   if (smartResponse) return smartResponse;
 
   // Analyze mood trends
