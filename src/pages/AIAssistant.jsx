@@ -117,7 +117,8 @@ const AIAssistant = () => {
         await loadUsage();
         haptic.success();
       } else {
-        showToast('Не удалось получить ответ от AI', 'error');
+        // Показываем сообщение об ошибке (например, rate limit)
+        showToast(response.message || 'Не удалось получить ответ от AI', 'error');
       }
     } catch (error) {
       console.error('Chat error:', error);

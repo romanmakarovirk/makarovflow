@@ -236,12 +236,18 @@ export const sendMessage = async (userMessage, conversationHistory = []) => {
     // Проверка минимального интервала между запросами
     if (now - lastRequestTime < MIN_REQUEST_INTERVAL) {
       const waitTime = Math.ceil((MIN_REQUEST_INTERVAL - (now - lastRequestTime)) / 1000);
-      throw new Error(`Подожди ${waitTime} секунд перед следующим запросом 🕐`);
+      return {
+        success: false,
+        message: `Подожди ${waitTime} секунд перед следующим запросом 🕐`
+      };
     }
 
     // Проверка лимита запросов в минуту
     if (requestCount >= MAX_REQUESTS_PER_MINUTE) {
-      throw new Error('Слишком много запросов. Подожди минуту ⏰');
+      return {
+        success: false,
+        message: 'Слишком много запросов. Подожди минуту ⏰'
+      };
     }
 
     // Обновляем счетчики
