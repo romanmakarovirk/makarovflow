@@ -9,6 +9,7 @@ const Tasks = () => {
   const [selectedList, setSelectedList] = useState('inbox'); // inbox, today, upcoming, someday
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [processingIds, setProcessingIds] = useState(new Set()); // Track processing tasks
 
   useEffect(() => {
     loadTasks();
@@ -20,50 +21,79 @@ const Tasks = () => {
   };
 
   const handleToggleComplete = async (id) => {
-    haptic.success();
-    await tasks.toggleComplete(id);
-    await userStats.updateTaskStats();
-    loadTasks();
+    // Prevent double-click race condition
+    if (processingIds.has(id)) return;
+    
+    setProcessingIds(prev => new Set(prev).add(id));
+    
+    try {
+      haptic.success();
+      await tasks.toggleComplete(id);
+      await userStats.updateTaskStats();
+      await loadTasks(); // Wait for load to complete
+    } catch (error) {
+      console.error('Error toggling task:', error);
+    } finally {
+      setProcessingIds(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
   };
 
   const handleAddTask = async () => {
     if (!newTaskTitle.trim()) return;
 
-    haptic.success();
-    await tasks.create({
-      title: newTaskTitle,
-      notes: '',
-      when: selectedList === 'today' ? 'today' : null,
-      list: selectedList,
-      reminder: null
-    });
+    // Basic validation
+    if (newTaskTitle.length > 500) {
+      return; // Title too long
+    }
 
-    setNewTaskTitle('');
-    setShowAddTask(false);
-    await userStats.updateTaskStats();
-    loadTasks();
+    try {
+      haptic.success();
+      await tasks.create({
+        title: newTaskTitle.trim(),
+        notes: '',
+        when: selectedList === 'today' ? 'today' : null,
+        list: selectedList,
+        reminder: null
+      });
+
+      setNewTaskTitle('');
+      setShowAddTask(false);
+      await userStats.updateTaskStats();
+      await loadTasks(); // Wait for load to complete
+    } catch (error) {
+      console.error('Error adding task:', error);
+    }
   };
 
-  // Things 3 style - группировка задач по спискам
-  const getTasksByList = (listId) => {
-    return allTasks.filter(t => !t.completed && t.list === listId);
-  };
+  // Things 3 style - группировка задач по спискам (мемоизировано)
+  const { inboxTasks, todayTasks, upcomingTasks, somedayTasks, completedTasks } = useMemo(() => {
+    const getTasksByList = (listId) => {
+      return allTasks.filter(t => !t.completed && t.list === listId);
+    };
 
-  const inboxTasks = getTasksByList('inbox');
-  const todayTasks = getTasksByList('today');
-  const upcomingTasks = getTasksByList('upcoming');
-  const somedayTasks = getTasksByList('someday');
-  const completedTasks = allTasks.filter(t => t.completed);
+    return {
+      inboxTasks: getTasksByList('inbox'),
+      todayTasks: getTasksByList('today'),
+      upcomingTasks: getTasksByList('upcoming'),
+      somedayTasks: getTasksByList('someday'),
+      completedTasks: allTasks.filter(t => t.completed)
+    };
+  }, [allTasks]);
 
-  // Things 3 style - списки с иконками и счетчиками
-  const lists = [
+  // Things 3 style - списки с иконками и счетчиками (мемоизировано)
+  const lists = useMemo(() => [
     { id: 'inbox', label: 'Входящие', icon: Inbox, count: inboxTasks.length, color: '#4A90E2' },
     { id: 'today', label: 'Сегодня', icon: Star, count: todayTasks.length, color: '#F5A623' },
     { id: 'upcoming', label: 'Предстоящие', icon: CalendarIcon, count: upcomingTasks.length, color: '#7ED321' },
     { id: 'someday', label: 'Когда-нибудь', icon: Clock, count: somedayTasks.length, color: '#9013FE' }
-  ];
+  ], [inboxTasks.length, todayTasks.length, upcomingTasks.length, somedayTasks.length]);
 
-  const getCurrentTasks = () => {
+  // Мемоизированные вычисления для текущих задач
+  const currentTasks = useMemo(() => {
     switch (selectedList) {
       case 'inbox': return inboxTasks;
       case 'today': return todayTasks;
@@ -71,10 +101,11 @@ const Tasks = () => {
       case 'someday': return somedayTasks;
       default: return inboxTasks;
     }
-  };
+  }, [selectedList, inboxTasks, todayTasks, upcomingTasks, somedayTasks]);
 
-  const currentTasks = getCurrentTasks();
-  const currentListData = lists.find(l => l.id === selectedList);
+  const currentListData = useMemo(() => {
+    return lists.find(l => l.id === selectedList);
+  }, [selectedList, lists]);
 
   return (
     <motion.div

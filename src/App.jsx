@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from './store/useStore';
 
-// Pages
-import Journal from './pages/Journal';
-import Tasks from './pages/Tasks';
-import AIAssistant from './pages/AIAssistant';
-import Settings from './pages/Settings';
+// Lazy load pages for better performance
+const Journal = lazy(() => import('./pages/Journal'));
+const Tasks = lazy(() => import('./pages/Tasks'));
+const AIAssistant = lazy(() => import('./pages/AIAssistant'));
+const Settings = lazy(() => import('./pages/Settings'));
 
-// Components
+// Components (loaded immediately as they're small)
 import Navigation from './components/Navigation';
 import Toast from './components/ui/Toast';
 
@@ -50,7 +50,13 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white pb-20">
-      {renderPage()}
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-white text-xl">{t('common.loading')}</div>
+        </div>
+      }>
+        {renderPage()}
+      </Suspense>
       <Navigation />
       {toast && <Toast message={toast.message} type={toast.type} />}
     </div>
