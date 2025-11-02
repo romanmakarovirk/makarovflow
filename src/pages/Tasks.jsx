@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Circle, CheckCircle2, ChevronRight, Inbox, Star, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import DOMPurify from 'dompurify';
 import { tasks, userStats } from '../db/database';
 import { haptic } from '../utils/telegram';
 
@@ -10,6 +11,16 @@ const Tasks = () => {
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [processingIds, setProcessingIds] = useState(new Set()); // Track processing tasks
+
+  // Безопасная санитизация текста для защиты от XSS
+  const sanitizeText = (text) => {
+    if (!text) return '';
+    return DOMPurify.sanitize(text, {
+      ALLOWED_TAGS: [], // Запрещаем все HTML теги
+      ALLOWED_ATTR: [], // Запрещаем все атрибуты
+      KEEP_CONTENT: true // Оставляем только текст
+    });
+  };
 
   useEffect(() => {
     loadTasks();
@@ -336,13 +347,13 @@ const Tasks = () => {
                           : 'text-white'
                       }`}
                     >
-                      {task.title}
+                      {sanitizeText(task.title)}
                     </p>
 
                     {/* Things 3 style - подзаголовок/заметка */}
                     {task.notes && (
                       <p className="text-[13px] text-gray-500 mt-1 line-clamp-1">
-                        {task.notes}
+                        {sanitizeText(task.notes)}
                       </p>
                     )}
                   </div>
@@ -417,7 +428,7 @@ const Tasks = () => {
                       style={{ opacity: 0.6 }}
                     />
                     <p className="text-[15px] text-gray-600 line-through flex-1">
-                      {task.title}
+                      {sanitizeText(task.title)}
                     </p>
                   </div>
                   {index < Math.min(completedTasks.length, 5) - 1 && (

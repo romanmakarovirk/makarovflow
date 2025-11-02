@@ -9,8 +9,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Подключение к базе данных
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  console.error('❌ ERROR: DATABASE_URL is required!');
+  console.error('Please set DATABASE_URL environment variable.');
+  process.exit(1);
+}
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_MRQwX1ByEA3z@ep-winter-thunder-ag7de0em-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require',
+  connectionString,
   ssl: {
     rejectUnauthorized: false
   }

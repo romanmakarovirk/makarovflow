@@ -11,9 +11,79 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// CORS configuration - only allow specific origins
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
+  'https://makarovflow.vercel.app',
+  'https://superlative-gelato-2ffbac.netlify.app',
+  'http://localhost:5173', // Dev server
+  'http://localhost:3000'  // Dev server
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.use(express.json({ limit: '10mb' })); // Limit request body size
+
+// Basic rate limiting middleware (simple in-memory implementation)
+const rateLimitStore = new Map();
+
+const rateLimit = (windowMs = 15 * 60 * 1000, max = 100) => {
+  return (req, res, next) => {
+    const key = req.ip || req.connection.remoteAddress;
+    const now = Date.now();
+
+    if (!rateLimitStore.has(key)) {
+      rateLimitStore.set(key, { count: 1, resetTime: now + windowMs });
+      return next();
+    }
+
+    const record = rateLimitStore.get(key);
+
+    // Reset if window expired
+    if (now > record.resetTime) {
+      record.count = 1;
+      record.resetTime = now + windowMs;
+      return next();
+    }
+
+    // Check limit
+    if (record.count >= max) {
+      return res.status(429).json({
+        error: 'Too many requests',
+        message: `Rate limit exceeded. Please try again in ${Math.ceil((record.resetTime - now) / 1000)} seconds.`,
+        retryAfter: Math.ceil((record.resetTime - now) / 1000)
+      });
+    }
+
+    record.count++;
+    next();
+  };
+};
+
+// Cleanup old rate limit records every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, record] of rateLimitStore.entries()) {
+    if (now > record.resetTime) {
+      rateLimitStore.delete(key);
+    }
+  }
+}, 5 * 60 * 1000);
+
+// Apply rate limiting to all API routes
+app.use('/api/', rateLimit(15 * 60 * 1000, 100)); // 100 requests per 15 minutes
+app.use('/api/auth/', rateLimit(15 * 60 * 1000, 10)); // Stricter limit for auth (10 per 15 min)
 
 // PostgreSQL connection
 const pool = new Pool({

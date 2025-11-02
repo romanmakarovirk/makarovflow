@@ -32,7 +32,7 @@ jobs:
 
       - name: Build
         env:
-          VITE_OPENROUTER_API_KEY: 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
+          VITE_OPENROUTER_API_KEY: ${{ secrets.VITE_OPENROUTER_API_KEY }}
         run: npm run build
 
       - name: Setup Pages

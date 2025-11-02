@@ -5,6 +5,17 @@
 
 import { journalEntries, tasks, homework, settings } from '../db/database';
 
+// Rate limiting для защиты от спама запросов
+let lastRequestTime = 0;
+const MIN_REQUEST_INTERVAL = 2000; // 2 секунды между запросами
+let requestCount = 0;
+const MAX_REQUESTS_PER_MINUTE = 20; // Максимум 20 запросов в минуту
+
+// Сбрасываем счетчик каждую минуту
+setInterval(() => {
+  requestCount = 0;
+}, 60000);
+
 /**
  * Parse context string into structured data
  */
@@ -219,6 +230,24 @@ const getUserContext = async () => {
  */
 export const sendMessage = async (userMessage, conversationHistory = []) => {
   try {
+    // Rate limiting проверка
+    const now = Date.now();
+
+    // Проверка минимального интервала между запросами
+    if (now - lastRequestTime < MIN_REQUEST_INTERVAL) {
+      const waitTime = Math.ceil((MIN_REQUEST_INTERVAL - (now - lastRequestTime)) / 1000);
+      throw new Error(`Подожди ${waitTime} секунд перед следующим запросом 🕐`);
+    }
+
+    // Проверка лимита запросов в минуту
+    if (requestCount >= MAX_REQUESTS_PER_MINUTE) {
+      throw new Error('Слишком много запросов. Подожди минуту ⏰');
+    }
+
+    // Обновляем счетчики
+    lastRequestTime = now;
+    requestCount++;
+
     // Get user context
     const context = await getUserContext();
 

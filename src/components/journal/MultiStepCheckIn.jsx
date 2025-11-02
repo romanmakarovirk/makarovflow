@@ -56,6 +56,9 @@ const MultiStepCheckIn = ({ existingEntry, onSave, onCancel }) => {
 
   const handleSave = async () => {
     try {
+      // Import validation
+      const { validateJournalEntry, sanitizeString } = await import('../../utils/validation');
+      
       const entry = {
         date: formData.date,
         mood: formData.mood.value,
@@ -63,9 +66,16 @@ const MultiStepCheckIn = ({ existingEntry, onSave, onCancel }) => {
         energy: formData.energy,
         sleepHours: formData.sleepHours,
         sleepQuality: formData.sleepQuality,
-        tags: formData.tags,
-        note: formData.note
+        tags: formData.tags || [],
+        note: sanitizeString(formData.note || '', 5000)
       };
+
+      // Validate entry
+      const validation = validateJournalEntry(entry);
+      if (!validation.isValid) {
+        showToast(`Ошибка валидации: ${validation.errors[0]}`, 'error');
+        return;
+      }
 
       if (existingEntry) {
         await journalEntries.update(existingEntry.id, entry);
@@ -77,6 +87,7 @@ const MultiStepCheckIn = ({ existingEntry, onSave, onCancel }) => {
       showToast('Запись сохранена', 'success');
       onSave();
     } catch (error) {
+      console.error('Error saving entry:', error);
       showToast('Ошибка сохранения', 'error');
     }
   };
