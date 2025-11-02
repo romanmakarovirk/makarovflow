@@ -21,6 +21,22 @@ secrets/
 *.key
 config/secrets.js
 
+# Documentation with sensitive data (regenerate without tokens)
+КРАТКАЯ_ПАМЯТКА.md
+КАК_СКРЫТЬ_ТОКЕНЫ.md
+PROJECT_ANALYSIS_REPORT.md
+ИНСТРУКЦИЯ_ПО_НАСТРОЙКЕ.md
+ИНСТРУКЦИЯ_ПО_ДОРАБОТКЕ_DOCX.md
+ЧТО_ИЗМЕНИЛОСЬ.md
+ИТОГОВЫЙ_ИНДИВИДУАЛЬНЫЙ_ПРОЕКТ*.md
+ИТОГОВЫЙ_ИНДИВИДУАЛЬНЫЙ_ПРОЕКТ*.docx
+КАК_КОНВЕРТИРОВАТЬ_В_DOCX.md
+bot-server/README.md
+bot-server/DEPLOY_TO_RAILWAY.md
+bot-server/RENDER_ИНСТРУКЦИЯ.md
+bot-server/deploy.sh
+create_docx.py
+
 # Editor
 .vscode
 .idea
