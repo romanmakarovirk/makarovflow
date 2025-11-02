@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Circle, CheckCircle2, ChevronRight, Inbox, Star, Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { tasks, userStats } from '../db/database';
