@@ -15,3 +15,5 @@ services:
         sync: false
       - key: WEB_APP_URL
         sync: false
+      - key: WEBHOOK_URL
+        sync: false
