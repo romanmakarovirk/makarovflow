@@ -1,12 +1,10 @@
 import { Bot, InlineKeyboard } from 'grammy';
 import http from 'http';
-import https from 'https';
 
 // Bot configuration from environment variables
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN;
 const WEB_APP_URL = process.env.WEB_APP_URL || 'https://makarovflow.vercel.app';
 const PORT = process.env.PORT || 3000;
-const RENDER_URL = process.env.RENDER_EXTERNAL_URL || 'https://mindflow-bot-5hph.onrender.com';
 
 // Validate required environment variables
 if (!BOT_TOKEN) {
@@ -76,16 +74,34 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`🌐 HTTP Server running on port ${PORT}`);
-  console.log(`🔄 Keep-alive enabled for ${RENDER_URL}`);
+  console.log(`🔄 Keep-alive enabled for localhost:${PORT}`);
 });
 
 // Keep-alive функция для предотвращения засыпания на Render
 function keepAlive() {
-  https.get(RENDER_URL, (res) => {
+  // Используем простой HTTP запрос к самому себе
+  const options = {
+    hostname: 'localhost',
+    port: PORT,
+    path: '/',
+    method: 'GET',
+    timeout: 5000
+  };
+
+  const req = http.request(options, (res) => {
     console.log(`✅ Keep-alive ping: ${res.statusCode}`);
-  }).on('error', (err) => {
+  });
+
+  req.on('error', (err) => {
     console.log('⚠️ Keep-alive ping failed:', err.message);
   });
+
+  req.on('timeout', () => {
+    console.log('⚠️ Keep-alive ping timeout');
+    req.destroy();
+  });
+
+  req.end();
 }
 
 // Пингуем сервер каждые 10 минут (Render засыпает через 15 минут неактивности)
