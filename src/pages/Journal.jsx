@@ -138,7 +138,7 @@ const Journal = () => {
             <div className="flex items-center gap-4">
               <span className="text-4xl">{todayEntry.moodEmoji}</span>
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-300 mb-1">Запись на сегодня создана</p>
+                <p className="text-sm font-medium text-gray-600 mb-1">Запись на сегодня создана</p>
                 <div className="flex items-center gap-3 text-xs text-gray-500">
                   <span>Настроение {todayEntry.mood}/10</span>
                   <span>•</span>
@@ -163,7 +163,7 @@ const Journal = () => {
                 <BookOpen size={40} className="text-blue-400" />
               </div>
               <div>
-                <p className="text-gray-300 text-lg font-medium mb-2">
+                <p className="text-gray-600 text-lg font-medium mb-2">
                   {t('journal.noEntries')}
                 </p>
                 <p className="text-gray-500 text-sm">
@@ -272,7 +272,7 @@ const Journal = () => {
                     <Calendar size={20} className="text-orange-400" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-white">Расписание</h3>
+                    <h3 className="text-sm font-semibold text-gray-900">Расписание</h3>
                     <p className="text-xs text-gray-500">
                       {scheduleData.length > 0 ? `${scheduleData.length} урока` : 'Пусто'}
                     </p>
@@ -283,7 +283,7 @@ const Journal = () => {
                     scheduleData.slice(0, 3).map((item, idx) => (
                       <div key={idx} className="flex items-center justify-between text-xs">
                         <span className="text-gray-400">{item.startTime}</span>
-                        <span className="text-gray-300">{item.subject}</span>
+                        <span className="text-gray-600">{item.subject}</span>
                       </div>
                     ))
                   ) : (
@@ -307,7 +307,7 @@ const Journal = () => {
                     <BookCheck size={20} className="text-blue-400" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-white">Домашка</h3>
+                    <h3 className="text-sm font-semibold text-gray-900">Домашка</h3>
                     <p className="text-xs text-gray-500">
                       {homeworkData.length > 0 ? `${homeworkData.length} задания` : 'Пусто'}
                     </p>
@@ -318,7 +318,7 @@ const Journal = () => {
                     homeworkData.map((item, idx) => (
                       <div key={idx} className="flex items-start gap-2">
                         <div className="w-4 h-4 rounded border border-gray-600 mt-0.5 flex-shrink-0"></div>
-                        <p className="text-xs text-gray-300 line-clamp-1">
+                        <p className="text-xs text-gray-600 line-clamp-1">
                           {item.subject}: {item.description || 'без описания'}
                         </p>
                       </div>
@@ -344,7 +344,7 @@ const Journal = () => {
                     <Calculator size={20} className="text-purple-400" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-white">Калькуляторы</h3>
+                    <h3 className="text-sm font-semibold text-gray-900">Калькуляторы</h3>
                     <p className="text-xs text-gray-500">GPA, средний балл</p>
                   </div>
                 </div>

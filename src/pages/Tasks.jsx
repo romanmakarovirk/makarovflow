@@ -156,7 +156,7 @@ const Tasks = () => {
                 }}
                 className={`flex items-center gap-2 px-3 py-2 rounded-xl font-medium text-sm whitespace-nowrap transition-all ${
                   isActive
-                    ? 'bg-white/10 text-white'
+                    ? 'bg-white/10 text-gray-900'
                     : 'bg-transparent text-gray-500'
                 }`}
                 whileTap={{ scale: 0.95 }}
@@ -184,7 +184,7 @@ const Tasks = () => {
       <div>
         {/* Things 3 style - заголовок раздела */}
         <div className="flex items-center justify-between mb-4 mt-2">
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-gray-900">
             {currentListData?.label}
           </h1>
 
@@ -198,7 +198,7 @@ const Tasks = () => {
               boxShadow: `0 2px 8px ${currentListData?.color}40`
             }}
           >
-            <Plus size={20} className="text-white" strokeWidth={2.5} />
+            <Plus size={20} className="text-gray-900" strokeWidth={2.5} />
           </motion.button>
         </div>
 
@@ -231,7 +231,7 @@ const Tasks = () => {
                       if (e.key === 'Escape') setShowAddTask(false);
                     }}
                     placeholder="Новая задача"
-                    className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-[15px]"
+                    className="flex-1 bg-transparent text-gray-900 placeholder-gray-500 outline-none text-[15px]"
                     autoFocus
                   />
                 </div>
@@ -249,7 +249,7 @@ const Tasks = () => {
                     whileTap={{ scale: 0.9 }}
                     onClick={handleAddTask}
                     disabled={!newTaskTitle.trim()}
-                    className="px-4 py-2 rounded-lg text-sm text-white disabled:opacity-40 disabled:cursor-not-allowed shadow-lg"
+                    className="px-4 py-2 rounded-lg text-sm text-gray-900 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg"
                     style={{ background: currentListData?.color }}
                   >
                     Добавить
@@ -358,7 +358,7 @@ const Tasks = () => {
                       className={`text-[15px] leading-tight transition-all duration-200 ${
                         task.completed
                           ? 'line-through text-gray-600'
-                          : 'text-white'
+                          : 'text-gray-900'
                       }`}
                     >
                       {sanitizeText(task.title)}

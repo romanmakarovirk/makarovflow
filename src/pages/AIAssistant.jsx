@@ -157,7 +157,7 @@ const AIAssistant = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-purple-500/25">
-                <Sparkles size={24} className="text-white" />
+                <Sparkles size={24} className="text-gray-900" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent tracking-tight">
@@ -232,7 +232,7 @@ const AIAssistant = () => {
               <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-purple-500/20 via-blue-500/20 to-cyan-500/20 mx-auto mb-4 flex items-center justify-center backdrop-blur-xl border border-white/10">
                 <Sparkles size={48} className="text-purple-400" />
               </div>
-              <h2 className="text-xl font-semibold text-white mb-2">
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">
                 Привет! Я твой AI-помощник
               </h2>
               <p className="text-gray-400 text-sm mb-6 max-w-md mx-auto">
@@ -250,7 +250,7 @@ const AIAssistant = () => {
                     transition={{ delay: idx * 0.1 }}
                     onClick={() => handleSuggestion(suggestion)}
                     whileTap={{ scale: 0.97 }}
-                    className="block w-full max-w-md mx-auto px-4 py-3 bg-gradient-to-br from-gray-800/60 to-gray-900/60 hover:from-gray-800/80 hover:to-gray-900/80 backdrop-blur-xl border border-white/5 rounded-xl text-sm text-gray-300 transition-all"
+                    className="block w-full max-w-md mx-auto px-4 py-3 bg-gradient-to-br from-gray-800/60 to-gray-900/60 hover:from-gray-800/80 hover:to-gray-900/80 backdrop-blur-xl border border-white/5 rounded-xl text-sm text-gray-600 transition-all"
                   >
                     {suggestion}
                   </motion.button>
@@ -272,8 +272,8 @@ const AIAssistant = () => {
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                     message.role === 'user'
-                      ? 'bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 text-white shadow-lg shadow-purple-500/25'
-                      : 'bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl border border-white/10 text-gray-200'
+                      ? 'bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 text-gray-900 shadow-lg shadow-purple-500/25'
+                      : 'bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl border border-white/10 text-gray-700'
                   }`}
                 >
                   <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
@@ -317,14 +317,14 @@ const AIAssistant = () => {
               }}
               placeholder="Напиши сообщение..."
               disabled={loading || remainingRequests === 0}
-              className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500 px-3 py-2 disabled:opacity-50"
+              className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder-gray-500 px-3 py-2 disabled:opacity-50"
             />
             <button
               onClick={() => handleSend()}
               disabled={!input.trim() || loading || remainingRequests === 0}
               className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/25"
             >
-              <Send size={18} className="text-white" />
+              <Send size={18} className="text-gray-900" />
             </button>
           </div>
         </div>
