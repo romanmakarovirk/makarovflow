@@ -8,12 +8,13 @@ import TagsSelector from './TagsSelector';
 import { journalEntries } from '../../db/database';
 import { useStore } from '../../store/useStore';
 import { haptic } from '../../utils/telegram';
+import { getLocalDate } from '../../utils/dates';
 
 const MultiStepCheckIn = ({ existingEntry, onSave, onCancel }) => {
   const { showToast } = useStore();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    date: existingEntry?.date || new Date().toISOString().split('T')[0],
+    date: existingEntry?.date || getLocalDate(),
     mood: existingEntry?.mood ? { value: existingEntry.mood, emoji: existingEntry.moodEmoji } : null,
     energy: existingEntry?.energy || 75,
     sleepHours: existingEntry?.sleepHours || 7,

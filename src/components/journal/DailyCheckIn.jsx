@@ -9,12 +9,13 @@ import SleepTracker from './SleepTracker';
 import TagsSelector from './TagsSelector';
 import { journalEntries } from '../../db/database';
 import { useStore } from '../../store/useStore';
+import { getLocalDate } from '../../utils/dates';
 
 const DailyCheckIn = ({ onSave, onCancel, existingEntry }) => {
   const { t } = useTranslation();
   const { showToast } = useStore();
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDate();
 
   const [formData, setFormData] = useState({
     date: today,

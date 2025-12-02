@@ -6,6 +6,7 @@ import { useStore } from '../../store/useStore';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import { haptic } from '../../utils/telegram';
+import { getLocalDate } from '../../utils/dates';
 
 const HomeworkManager = ({ isOpen, onClose }) => {
   const { showToast } = useStore();
@@ -14,7 +15,7 @@ const HomeworkManager = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     subject: '',
     description: '',
-    dueDate: new Date().toISOString().split('T')[0],
+    dueDate: getLocalDate(),
     priority: 'medium'
   });
 
@@ -41,7 +42,7 @@ const HomeworkManager = ({ isOpen, onClose }) => {
     setFormData({
       subject: '',
       description: '',
-      dueDate: new Date().toISOString().split('T')[0],
+      dueDate: getLocalDate(),
       priority: 'medium'
     });
     haptic.success();
