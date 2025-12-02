@@ -11,6 +11,7 @@ const Settings = lazy(() => import('./pages/Settings'));
 // Components (loaded immediately as they're small)
 import Navigation from './components/Navigation';
 import Toast from './components/ui/Toast';
+import OfflineIndicator from './components/ui/OfflineIndicator';
 
 function App() {
   const { t } = useTranslation();
@@ -50,6 +51,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white pb-20">
+      <OfflineIndicator />
       <Suspense fallback={
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-white text-xl">{t('common.loading')}</div>
