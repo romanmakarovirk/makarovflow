@@ -3,6 +3,8 @@
  * Free tier: No API key required for some models
  */
 
+import logger from '../utils/logger';
+
 // Hugging Face Inference API endpoint
 const HF_API_URL = 'https://api-inference.huggingface.co/models';
 
@@ -58,7 +60,7 @@ export const analyzeMoodFromText = async (text) => {
 
     return null;
   } catch (error) {
-    console.error('AI mood analysis failed:', error);
+    logger.error('AI mood analysis failed:', error);
     return null;
   }
 };
@@ -194,7 +196,7 @@ export const generateInsights = async (entries) => {
       insights
     };
   } catch (error) {
-    console.error('Failed to generate insights:', error);
+    logger.error('Failed to generate insights:', error);
     return {
       summary: 'Не удалось сгенерировать инсайты',
       insights: []
@@ -304,7 +306,7 @@ export const predictTomorrowMood = (entries) => {
       }
     };
   } catch (error) {
-    console.error('Prediction error:', error);
+    logger.error('Prediction error:', error);
     return null;
   }
 };
@@ -438,7 +440,7 @@ export const analyzeTaskMoodCorrelation = async (entries, tasks) => {
       dataPoints: dailyStats.length
     };
   } catch (error) {
-    console.error('Task-mood correlation error:', error);
+    logger.error('Task-mood correlation error:', error);
     return null;
   }
 };

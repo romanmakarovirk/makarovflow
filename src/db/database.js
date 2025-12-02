@@ -1,4 +1,40 @@
 import Dexie from 'dexie';
+import { getLocalDate, formatLocalDate, getDateDaysAgo } from '../utils/dates';
+import logger from '../utils/logger';
+
+// Check IndexedDB support and availability
+const checkIndexedDBSupport = () => {
+  if (!window.indexedDB) {
+    throw new Error('IndexedDB не поддерживается вашим браузером. Пожалуйста, обновите браузер или используйте другой.');
+  }
+
+  // Check for private browsing mode (Safari)
+  try {
+    const testDB = window.indexedDB.open('__test__');
+    testDB.onerror = () => {
+      throw new Error('IndexedDB заблокирован. Возможно, вы используете приватный режим браузера. Отключите приватный режим для работы приложения.');
+    };
+    testDB.onsuccess = () => {
+      window.indexedDB.deleteDatabase('__test__');
+    };
+  } catch (e) {
+    logger.error('IndexedDB check failed:', e);
+    throw new Error('Невозможно использовать локальное хранилище. Проверьте настройки браузера.');
+  }
+};
+
+// Run check before initializing database
+try {
+  checkIndexedDBSupport();
+} catch (error) {
+  logger.error('Database initialization failed:', error);
+  // Show error to user
+  if (typeof window !== 'undefined') {
+    const errorMessage = error.message || 'Ошибка инициализации базы данных';
+    // This will be caught by the App component
+    window.__dbInitError = errorMessage;
+  }
+}
 
 // Initialize Dexie database
 export const db = new Dexie('MindFlowDB');
@@ -76,25 +112,40 @@ export const journalEntries = {
 
   // Create new entry
   create: async (entry) => {
-    const now = Date.now();
-    return await db.journal_entries.add({
-      ...entry,
-      createdAt: now,
-      updatedAt: now
-    });
+    try {
+      const now = Date.now();
+      return await db.journal_entries.add({
+        ...entry,
+        createdAt: now,
+        updatedAt: now
+      });
+    } catch (error) {
+      logger.error('Failed to create journal entry:', error);
+      throw new Error('Не удалось сохранить запись. Проверьте хранилище браузера.');
+    }
   },
 
   // Update entry
   update: async (id, updates) => {
-    return await db.journal_entries.update(id, {
-      ...updates,
-      updatedAt: Date.now()
-    });
+    try {
+      return await db.journal_entries.update(id, {
+        ...updates,
+        updatedAt: Date.now()
+      });
+    } catch (error) {
+      logger.error('Failed to update journal entry:', error);
+      throw new Error('Не удалось обновить запись.');
+    }
   },
 
   // Delete entry
   delete: async (id) => {
-    return await db.journal_entries.delete(id);
+    try {
+      return await db.journal_entries.delete(id);
+    } catch (error) {
+      logger.error('Failed to delete journal entry:', error);
+      throw new Error('Не удалось удалить запись.');
+    }
   },
 
   // Check if entry exists for date
@@ -265,7 +316,7 @@ export const settings = {
   // AI Usage tracking
   getAIUsage: async () => {
     const setting = await settings.get();
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDate();
 
     if (!setting.aiUsage) {
       const aiUsage = {
@@ -381,45 +432,68 @@ export const tasks = {
 
   // Create task
   create: async (task) => {
-    const now = Date.now();
-    return await db.tasks.add({
-      title: '',
-      notes: '',
-      list: 'inbox', // inbox, today, upcoming, someday
-      area: null,
-      project: null,
-      when: null, // null, 'today', date string, 'someday'
-      deadline: null,
-      tags: [],
-      completed: false,
-      ...task,
-      createdAt: now,
-      updatedAt: now,
-      completedAt: null
-    });
+    try {
+      const now = Date.now();
+      return await db.tasks.add({
+        title: '',
+        notes: '',
+        list: 'inbox', // inbox, today, upcoming, someday
+        area: null,
+        project: null,
+        when: null, // null, 'today', date string, 'someday'
+        deadline: null,
+        tags: [],
+        completed: false,
+        ...task,
+        createdAt: now,
+        updatedAt: now,
+        completedAt: null
+      });
+    } catch (error) {
+      logger.error('Failed to create task:', error);
+      throw new Error('Не удалось создать задачу.');
+    }
   },
 
   // Update task
   update: async (id, updates) => {
-    return await db.tasks.update(id, {
-      ...updates,
-      updatedAt: Date.now()
-    });
+    try {
+      return await db.tasks.update(id, {
+        ...updates,
+        updatedAt: Date.now()
+      });
+    } catch (error) {
+      logger.error('Failed to update task:', error);
+      throw new Error('Не удалось обновить задачу.');
+    }
   },
 
   // Toggle completion
   toggleComplete: async (id) => {
-    const task = await db.tasks.get(id);
-    return await db.tasks.update(id, {
-      completed: !task.completed,
-      completedAt: !task.completed ? Date.now() : null,
-      updatedAt: Date.now()
-    });
+    try {
+      const task = await db.tasks.get(id);
+      if (!task) {
+        throw new Error('Task not found');
+      }
+      return await db.tasks.update(id, {
+        completed: !task.completed,
+        completedAt: !task.completed ? Date.now() : null,
+        updatedAt: Date.now()
+      });
+    } catch (error) {
+      logger.error('Failed to toggle task:', error);
+      throw new Error('Не удалось изменить статус задачи.');
+    }
   },
 
   // Delete task
   delete: async (id) => {
-    return await db.tasks.delete(id);
+    try {
+      return await db.tasks.delete(id);
+    } catch (error) {
+      logger.error('Failed to delete task:', error);
+      throw new Error('Не удалось удалить задачу.');
+    }
   },
 
   // Move task to today
@@ -506,7 +580,7 @@ export const importData = async (jsonData) => {
 
     return true;
   } catch (error) {
-    console.error('Failed to import data:', error);
+    logger.error('Failed to import data:', error);
     return false;
   }
 };
@@ -584,34 +658,36 @@ export const userStats = {
   updateEntryStats: async () => {
     const stats = await userStats.get();
     const entries = await journalEntries.getAll();
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDate();
 
     let currentStreak = 0;
-    let longestStreak = 0;
-    let streak = 0;
+    let tempStreak = 0;
+    let maxStreakFound = 0;
 
     // Calculate streaks
     const sortedEntries = entries.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     for (let i = 0; i < sortedEntries.length; i++) {
-      const entryDate = new Date(sortedEntries[i].date);
-      const expectedDate = new Date(today);
-      expectedDate.setDate(expectedDate.getDate() - i);
+      const entryDate = sortedEntries[i].date;
+      const expectedDate = getDateDaysAgo(i);
 
-      if (entryDate.toISOString().split('T')[0] === expectedDate.toISOString().split('T')[0]) {
-        streak++;
-        if (i === 0) currentStreak = streak;
-        longestStreak = Math.max(longestStreak, streak);
+      if (entryDate === expectedDate) {
+        tempStreak++;
+        if (i === 0) currentStreak = tempStreak;
+        maxStreakFound = Math.max(maxStreakFound, tempStreak);
       } else {
+        // Save the streak we found before breaking
+        maxStreakFound = Math.max(maxStreakFound, tempStreak);
         if (i === 0) currentStreak = 0;
-        streak = 0;
+        tempStreak = 0;
+        // Don't break - continue looking for other streaks
       }
     }
 
     return await db.user_stats.update(1, {
       totalEntries: entries.length,
       currentStreak,
-      longestStreak: Math.max(stats.longestStreak, longestStreak),
+      longestStreak: Math.max(stats.longestStreak, maxStreakFound),
       lastEntryDate: today
     });
   },

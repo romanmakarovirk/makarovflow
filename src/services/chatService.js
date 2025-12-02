@@ -4,17 +4,45 @@
  */
 
 import { journalEntries, tasks, homework, settings } from '../db/database';
+import { getLocalDate } from '../utils/dates';
+import logger from '../utils/logger';
 
 // Rate limiting для защиты от спама запросов
 let lastRequestTime = 0;
 const MIN_REQUEST_INTERVAL = 2000; // 2 секунды между запросами
 let requestCount = 0;
 const MAX_REQUESTS_PER_MINUTE = 20; // Максимум 20 запросов в минуту
+let rateLimitIntervalId = null;
 
-// Сбрасываем счетчик каждую минуту
-setInterval(() => {
-  requestCount = 0;
-}, 60000);
+/**
+ * Initialize rate limiting interval
+ * Should be called once when app starts
+ */
+export const initRateLimiting = () => {
+  // Prevent duplicate intervals
+  if (rateLimitIntervalId) return;
+
+  // Сбрасываем счетчик каждую минуту
+  rateLimitIntervalId = setInterval(() => {
+    requestCount = 0;
+  }, 60000);
+};
+
+/**
+ * Cleanup rate limiting interval
+ * Should be called when app unmounts (cleanup)
+ */
+export const cleanupRateLimiting = () => {
+  if (rateLimitIntervalId) {
+    clearInterval(rateLimitIntervalId);
+    rateLimitIntervalId = null;
+  }
+};
+
+// Auto-initialize on first import
+if (typeof window !== 'undefined') {
+  initRateLimiting();
+}
 
 /**
  * Parse context string into structured data
@@ -220,7 +248,7 @@ const getUserContext = async () => {
 
     return context;
   } catch (error) {
-    console.error('Failed to get user context:', error);
+    logger.error('Failed to get user context:', error);
     return '';
   }
 };
@@ -302,7 +330,7 @@ ${context}
         }
       }
     } catch (apiError) {
-      console.log('Hugging Face API error, using fallback:', apiError.message);
+      logger.info('Hugging Face API error, using fallback:', apiError.message);
     }
 
     // Fallback to smart local responses
@@ -313,7 +341,7 @@ ${context}
       message: response
     };
   } catch (error) {
-    console.error('AI chat error:', error);
+    logger.error('AI chat error:', error);
     return {
       success: true,
       message: generateFallbackResponse(userMessage, '')
