@@ -4,7 +4,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)
 ![License](https://img.shields.io/badge/license-Personal-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Telegram%20Mini%20App-blue.svg)
 ![Security](https://img.shields.io/badge/vulnerabilities-0-success.svg)
@@ -153,7 +153,7 @@ npm run build
 
 ---
 
-## ✅ Последние обновления (v1.0.2)
+## ✅ Последние обновления (v1.0.3)
 
 ### Исправления безопасности
 - ✅ Удален утечка API ключа из Git
