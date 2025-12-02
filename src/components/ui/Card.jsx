@@ -8,15 +8,15 @@ const Card = ({
   glassmorphism = true, // Default to Liquid Glass
   ...props
 }) => {
-  const baseStyles = 'rounded-3xl shadow-2xl';
+  const baseStyles = 'rounded-3xl';
 
-  // Liquid Glass effect (iOS 18 style)
+  // Apple-style Frosted Glass effect
   const cardStyles = glassmorphism
-    ? 'bg-gradient-to-br from-gray-800/70 via-gray-800/60 to-gray-900/70 backdrop-blur-2xl backdrop-saturate-150 border border-white/10'
-    : 'bg-gray-800/50 backdrop-blur-sm border border-gray-700';
+    ? 'bg-white/70 backdrop-blur-xl backdrop-saturate-180 border border-black/10 shadow-[0_8px_32px_rgba(0,0,0,0.08)]'
+    : 'bg-white/50 backdrop-blur-sm border border-black/5 shadow-sm';
 
   const interactiveStyles = hoverable || onClick
-    ? 'cursor-pointer hover:scale-[1.01] hover:shadow-3xl active:scale-[0.99] transition-all duration-300 ease-out'
+    ? 'cursor-pointer hover:scale-[1.02] hover:shadow-[0_12px_48px_rgba(0,0,0,0.12)] active:scale-[0.98] transition-all duration-300 ease-out'
     : '';
 
   const CardWrapper = onClick ? motion.div : 'div';

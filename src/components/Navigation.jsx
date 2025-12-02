@@ -9,9 +9,9 @@ const Navigation = () => {
   const { currentPage, setCurrentPage } = useStore();
 
   // Определяем цвет фона навигации в зависимости от текущей страницы
-  // Подбираем цвет под фон каждой страницы для идеального blend эффекта
+  // Светлый frosted glass эффект в стиле Apple
   const getNavBackground = () => {
-    return 'rgba(17, 24, 39, 0.72)'; // bg-gray-900 с прозрачностью для всех страниц
+    return 'rgba(255, 255, 255, 0.7)'; // Белый с прозрачностью для frosted glass
   };
 
   const navItems = [
@@ -32,9 +32,9 @@ const Navigation = () => {
     <nav className="fixed bottom-0 left-0 right-0 z-50 px-3 pb-7 pointer-events-none will-change-transform">
       {/* Outer glow effect - создает мягкое свечение вокруг панели */}
       <div
-        className="absolute inset-0 blur-xl opacity-30 pointer-events-none"
+        className="absolute inset-0 blur-xl opacity-20 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center bottom, rgba(120, 120, 140, 0.3), transparent 70%)'
+          background: 'radial-gradient(ellipse at center bottom, rgba(0, 122, 255, 0.2), transparent 70%)'
         }}
       />
 
@@ -45,21 +45,20 @@ const Navigation = () => {
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
         className="relative mx-auto max-w-md pointer-events-auto"
         style={{
-          // Liquid Glass эффект из Telegram iOS 26
-          // Адаптивный фон под цвет текущей страницы
+          // Liquid Glass эффект в стиле Apple iOS
           background: getNavBackground(),
           backdropFilter: 'saturate(180%) blur(20px)',
           WebkitBackdropFilter: 'saturate(180%) blur(20px)',
           borderRadius: '28px',
-          // Мягкая тень и свечение для "приподнятости"
+          // Apple-style тени для светлой темы
           boxShadow: `
-            0 10px 40px rgba(0, 0, 0, 0.3),
-            0 2px 12px rgba(0, 0, 0, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.3)
+            0 10px 40px rgba(0, 0, 0, 0.08),
+            0 2px 8px rgba(0, 0, 0, 0.06),
+            inset 0 1px 0 rgba(255, 255, 255, 0.8),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.05)
           `,
           // Тонкая граница для эффекта стекла
-          border: '0.5px solid rgba(255, 255, 255, 0.1)',
+          border: '0.5px solid rgba(0, 0, 0, 0.1)',
           // Hardware acceleration fix для анимации
           transform: 'translateZ(0)',
           backfaceVisibility: 'hidden',
@@ -70,7 +69,7 @@ const Navigation = () => {
         <div
           className="absolute inset-x-0 top-0 h-1/3 pointer-events-none rounded-t-[28px]"
           style={{
-            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%)'
+            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, transparent 100%)'
           }}
         />
 
@@ -89,14 +88,14 @@ const Navigation = () => {
                 whileTap={{ scale: 0.92 }}
                 transition={{ duration: 0.15 }}
               >
-                {/* Активный фон - pill-образная форма (как в iOS 18) */}
+                {/* Активный фон - pill-образная форма (как в iOS) */}
                 {isActive && (
                   <motion.div
                     className="absolute inset-0 rounded-[20px]"
                     style={{
-                      // Темный округлый фон для активной вкладки
-                      background: 'rgba(60, 60, 67, 0.6)',
-                      boxShadow: 'inset 0 0 0 0.5px rgba(255, 255, 255, 0.08)'
+                      // Светлый акцентный фон для активной вкладки - Apple blue
+                      background: 'linear-gradient(135deg, rgba(0, 122, 255, 0.15), rgba(0, 122, 255, 0.1))',
+                      boxShadow: 'inset 0 0 0 0.5px rgba(0, 122, 255, 0.2)'
                     }}
                     initial={{ opacity: 0, scale: 0.85 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -121,11 +120,11 @@ const Navigation = () => {
                     size={28}
                     strokeWidth={isActive ? 2.5 : 2}
                     className={`transition-colors duration-200 ${
-                      isActive ? 'text-white' : 'text-gray-500'
+                      isActive ? 'text-blue-600' : 'text-gray-500'
                     }`}
                     style={{
                       // Легкое свечение для активной иконки
-                      filter: isActive ? 'drop-shadow(0 2px 4px rgba(255, 255, 255, 0.2))' : 'none'
+                      filter: isActive ? 'drop-shadow(0 2px 4px rgba(0, 122, 255, 0.3))' : 'none'
                     }}
                   />
                 </motion.div>
@@ -133,10 +132,10 @@ const Navigation = () => {
                 {/* Label text */}
                 <motion.span
                   className={`text-[10px] font-semibold relative z-10 transition-all duration-200 ${
-                    isActive ? 'text-white' : 'text-gray-500'
+                    isActive ? 'text-blue-600' : 'text-gray-500'
                   }`}
                   animate={{
-                    opacity: isActive ? 1 : 0.85
+                    opacity: isActive ? 1 : 0.7
                   }}
                   transition={{ duration: 0.2 }}
                 >
