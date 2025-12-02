@@ -28,8 +28,8 @@ function App() {
 
   if (!isInitialized) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white text-xl">{t('common.loading')}</div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-gray-800 text-xl font-medium">{t('common.loading')}</div>
       </div>
     );
   }
@@ -50,11 +50,11 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 text-gray-900 pb-20">
       <OfflineIndicator />
       <Suspense fallback={
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-white text-xl">{t('common.loading')}</div>
+          <div className="text-gray-800 text-xl font-medium">{t('common.loading')}</div>
         </div>
       }>
         {renderPage()}
