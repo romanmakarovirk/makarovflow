@@ -4,6 +4,7 @@ import { Plus, Circle, CheckCircle2, ChevronRight, Inbox, Star, Calendar as Cale
 import DOMPurify from 'dompurify';
 import { tasks, userStats } from '../db/database';
 import { haptic } from '../utils/telegram';
+import logger from '../utils/logger';
 
 const Tasks = () => {
   const [allTasks, setAllTasks] = useState([]);
@@ -34,16 +35,29 @@ const Tasks = () => {
   const handleToggleComplete = async (id) => {
     // Prevent double-click race condition
     if (processingIds.has(id)) return;
-    
+
+    // Optimistic UI update - update immediately for better UX
+    const taskToToggle = allTasks.find(t => t.id === id);
+    if (!taskToToggle) return;
+
+    const newCompletedState = !taskToToggle.completed;
+
+    setAllTasks(prev => prev.map(t =>
+      t.id === id ? { ...t, completed: newCompletedState } : t
+    ));
+
     setProcessingIds(prev => new Set(prev).add(id));
-    
+
     try {
       haptic.success();
       await tasks.toggleComplete(id);
       await userStats.updateTaskStats();
-      await loadTasks(); // Wait for load to complete
     } catch (error) {
-      console.error('Error toggling task:', error);
+      logger.error('Error toggling task:', error);
+      // Rollback on error
+      setAllTasks(prev => prev.map(t =>
+        t.id === id ? { ...t, completed: !newCompletedState } : t
+      ));
     } finally {
       setProcessingIds(prev => {
         const next = new Set(prev);
@@ -76,7 +90,7 @@ const Tasks = () => {
       await userStats.updateTaskStats();
       await loadTasks(); // Wait for load to complete
     } catch (error) {
-      console.error('Error adding task:', error);
+      logger.error('Error adding task:', error);
     }
   };
 

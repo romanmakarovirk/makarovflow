@@ -13,6 +13,7 @@ import GPACalculator from '../components/study/GPACalculator';
 import { journalEntries, userStats, schedule, homework } from '../db/database';
 import { calculateWeeklySummary } from '../utils/analytics';
 import { haptic } from '../utils/telegram';
+import { getLocalDate } from '../utils/dates';
 
 const Journal = () => {
   const { t } = useTranslation();
@@ -54,7 +55,7 @@ const Journal = () => {
   };
 
   const checkTodayEntry = async () => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDate();
     const entry = await journalEntries.getByDate(today);
     setTodayEntry(entry);
   };
