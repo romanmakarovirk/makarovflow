@@ -75,7 +75,7 @@ const Settings = () => {
                 onClick={() => handleLanguageChange('ru')}
                 className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all ${
                   language === 'ru'
-                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-gray-900 shadow-lg shadow-blue-500/25'
                     : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800/70'
                 }`}
               >
@@ -86,7 +86,7 @@ const Settings = () => {
                 onClick={() => handleLanguageChange('en')}
                 className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all ${
                   language === 'en'
-                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
+                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-gray-900 shadow-lg shadow-blue-500/25'
                     : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800/70'
                 }`}
               >
@@ -115,7 +115,7 @@ const Settings = () => {
                   <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 flex items-center justify-center">
                     <Download size={18} className="text-emerald-400" />
                   </div>
-                  <span className="text-gray-300 font-medium">Экспортировать данные</span>
+                  <span className="text-gray-600 font-medium">Экспортировать данные</span>
                 </div>
                 <ChevronRight size={18} className="text-gray-500 group-hover:text-gray-400 transition-colors" />
               </motion.button>
@@ -129,7 +129,7 @@ const Settings = () => {
                   <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-red-500/20 to-red-600/20 flex items-center justify-center">
                     <Trash2 size={18} className="text-red-400" />
                   </div>
-                  <span className="text-gray-300 font-medium">Удалить все данные</span>
+                  <span className="text-gray-600 font-medium">Удалить все данные</span>
                 </div>
                 <ChevronRight size={18} className="text-gray-500 group-hover:text-red-400 transition-colors" />
               </motion.button>
@@ -148,11 +148,11 @@ const Settings = () => {
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between py-2">
                 <span className="text-gray-400">Версия</span>
-                <span className="text-gray-300 font-medium">1.0.3</span>
+                <span className="text-gray-600 font-medium">1.0.3</span>
               </div>
               <div className="flex items-center justify-between py-2">
                 <span className="text-gray-400">Платформа</span>
-                <span className="text-gray-300 font-medium">Telegram Mini App</span>
+                <span className="text-gray-600 font-medium">Telegram Mini App</span>
               </div>
               <div className="border-t border-gray-700/50 pt-3 mt-3">
                 <p className="text-gray-500 text-xs text-center">
