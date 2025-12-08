@@ -6,37 +6,40 @@
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light;
-
+  color-scheme: dark;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Apple-inspired color palette */
-  --bg-primary: #f5f5f7;
-  --bg-secondary: #ffffff;
-  --bg-glass: rgba(255, 255, 255, 0.7);
-  --text-primary: #1d1d1f;
-  --text-secondary: #6e6e73;
-  --accent: #007aff;
-  --accent-light: #e3f2fd;
-  --border: rgba(0, 0, 0, 0.08);
-  --shadow: rgba(0, 0, 0, 0.1);
+  /* Midnight palette */
+  --bg-primary: #050912;
+  --bg-secondary: #0b1220;
+  --bg-glass: rgba(15, 23, 42, 0.7);
+  --text-primary: #e9edf7;
+  --text-secondary: #9ba7c3;
+  --accent: #7c7eff;
+  --accent-2: #3fc5ff;
+  --border: rgba(255, 255, 255, 0.08);
+  --shadow: rgba(7, 11, 26, 0.55);
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  transition: color 0.25s ease, background-color 0.35s ease, border-color 0.35s ease, transform 0.2s ease;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(124, 58, 237, 0.18), transparent 35%),
+    radial-gradient(circle at 80% 10%, rgba(34, 211, 238, 0.16), transparent 30%),
+    radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.18), transparent 28%),
+    linear-gradient(180deg, #050912 0%, #0b1023 60%, #0c132a 100%);
   color: var(--text-primary);
   overflow-x: hidden;
 }
@@ -46,53 +49,70 @@ body {
   min-height: 100vh;
 }
 
-/* Custom scrollbar for light theme */
+/* Custom scrollbar tuned for dark UI */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(124, 126, 255, 0.6), rgba(63, 197, 255, 0.5));
+  border-radius: 999px;
+  border: 2px solid rgba(5, 9, 18, 0.9);
+  box-shadow: 0 0 12px rgba(124, 126, 255, 0.3);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+  background: linear-gradient(180deg, rgba(124, 126, 255, 0.9), rgba(63, 197, 255, 0.8));
 }
 
-/* Frosted Glass Effect */
+/* Frosted Glass helpers */
 .glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--bg-glass);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-dark {
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(30px) saturate(200%);
-  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  background: rgba(8, 12, 24, 0.8);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Smooth transitions */
-* {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.theme-midnight {
+  color: var(--text-primary);
 }
 
-/* Apple-style shadows */
-.shadow-apple {
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.12),
-    0 1px 2px rgba(0, 0, 0, 0.08);
+/* Remap frequently used gray text utilities so dark mode stays readable */
+.theme-midnight .text-gray-900 { color: #f8fafc !important; }
+.theme-midnight .text-gray-800 { color: #e5e7eb !important; }
+.theme-midnight .text-gray-700 { color: #cbd5e1 !important; }
+.theme-midnight .text-gray-600 { color: #b0b8cf !important; }
+.theme-midnight .text-gray-500 { color: #9aa3ba !important; }
+.theme-midnight .text-gray-400 { color: #7f89a8 !important; }
+
+/* And the common muted backgrounds */
+.theme-midnight .bg-white\/10,
+.theme-midnight .bg-white\/20,
+.theme-midnight .bg-white\/30,
+.theme-midnight .bg-white\/50,
+.theme-midnight .bg-white\/70,
+.theme-midnight .bg-gray-100,
+.theme-midnight .bg-gray-200 {
+  background-color: rgba(255, 255, 255, 0.06) !important;
 }
 
-.shadow-apple-lg {
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.1),
-    0 2px 8px rgba(0, 0, 0, 0.06);
+.theme-midnight .border-gray-200,
+.theme-midnight .border-gray-300,
+.theme-midnight .border-gray-400,
+.theme-midnight .border-gray-500,
+.theme-midnight .border-gray-600,
+.theme-midnight .border-gray-700 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }

@@ -11,14 +11,14 @@ const Button = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2';
+  const baseStyles = 'font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg ring-1 ring-white/10';
 
   const variants = {
-    primary: 'bg-gradient-to-b from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-[0_4px_12px_rgba(0,122,255,0.3)]',
-    secondary: 'bg-white/80 backdrop-blur-md text-gray-900 hover:bg-white border border-black/10 shadow-sm',
-    danger: 'bg-gradient-to-b from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-[0_4px_12px_rgba(239,68,68,0.3)]',
-    ghost: 'bg-transparent text-gray-700 hover:bg-black/5',
-    success: 'bg-gradient-to-b from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-[0_4px_12px_rgba(34,197,94,0.3)]'
+    primary: 'bg-gradient-to-r from-[#7c7eff] via-[#6c7bff] to-[#3fc5ff] text-slate-50 hover:shadow-[0_12px_48px_rgba(63,197,255,0.5)]',
+    secondary: 'bg-white/10 backdrop-blur-lg text-slate-100 hover:bg-white/15 border border-white/10',
+    danger: 'bg-gradient-to-r from-[#ef4444] via-[#f97316] to-[#f59e0b] text-white hover:shadow-[0_12px_40px_rgba(239,68,68,0.35)]',
+    ghost: 'bg-transparent text-slate-300 hover:bg-white/5 border border-transparent',
+    success: 'bg-gradient-to-r from-emerald-500 to-teal-400 text-white hover:shadow-[0_12px_40px_rgba(16,185,129,0.35)]'
   };
 
   const sizes = {
