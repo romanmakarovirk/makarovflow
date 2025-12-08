@@ -10,10 +10,10 @@ const Card = ({
 }) => {
   const baseStyles = 'rounded-3xl relative overflow-hidden';
 
-  // Midnight glass morphism effect
+  // Midnight glass morphism effect - более светлый
   const cardStyles = glassmorphism
-    ? 'bg-gradient-to-br from-[#101727]/85 via-[#0c1220]/85 to-[#0a101d]/90 border border-white/5 shadow-[0_12px_48px_rgba(0,0,0,0.45)] ring-1 ring-white/5 backdrop-blur-2xl'
-    : 'bg-[#0e1526]/85 border border-white/5 shadow-[0_10px_36px_rgba(0,0,0,0.35)] backdrop-blur-xl';
+    ? 'bg-gradient-to-br from-[#1a1f2e]/80 via-[#161b28]/80 to-[#141922]/85 border border-white/8 shadow-[0_8px_32px_rgba(0,0,0,0.3)] ring-1 ring-white/8 backdrop-blur-2xl'
+    : 'bg-[#161b28]/80 border border-white/8 shadow-[0_6px_24px_rgba(0,0,0,0.25)] backdrop-blur-xl';
 
   const interactiveStyles = hoverable || onClick
     ? 'cursor-pointer hover:scale-[1.02] hover:shadow-[0_12px_48px_rgba(0,0,0,0.12)] active:scale-[0.98] transition-all duration-300 ease-out'
@@ -28,7 +28,7 @@ const Card = ({
       whileTap={onClick ? { scale: 0.97 } : {}}
       {...props}
     >
-      <div className="pointer-events-none absolute inset-px rounded-[22px] opacity-50 bg-[radial-gradient(circle_at_20%_20%,rgba(124,126,255,0.25),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(63,197,255,0.18),transparent_35%)]" />
+      <div className="pointer-events-none absolute inset-px rounded-[22px] opacity-40 bg-[radial-gradient(circle_at_20%_20%,rgba(124,126,255,0.15),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(63,197,255,0.12),transparent_40%)]" />
       <div className="relative z-10">
         {children}
       </div>

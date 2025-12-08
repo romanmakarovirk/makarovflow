@@ -316,18 +316,27 @@ ${context}
           aiMessage = data[0].generated_text.trim();
         } else if (data.generated_text) {
           aiMessage = data.generated_text.trim();
+        } else if (data.error) {
+          // API вернул ошибку (например, модель загружается)
+          logger.info('Hugging Face API error:', data.error);
+          throw new Error(data.error);
         }
 
         // Если получили ответ на английском или странный, используем fallback
         if (aiMessage && aiMessage.length > 10 && !aiMessage.includes('[/INST]')) {
           // Переводим на русский если нужно и очищаем
           aiMessage = aiMessage.replace(/\[INST\].*?\[\/INST\]/g, '').trim();
+          aiMessage = aiMessage.replace(/^\[INST\].*?\[\/INST\]/g, '').trim();
 
           return {
             success: true,
             message: aiMessage
           };
         }
+      } else {
+        // Если ответ не OK, логируем и используем fallback
+        const errorData = await response.json().catch(() => ({}));
+        logger.info('Hugging Face API returned error:', response.status, errorData);
       }
     } catch (apiError) {
       logger.info('Hugging Face API error, using fallback:', apiError.message);
