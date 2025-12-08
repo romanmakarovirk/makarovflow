@@ -285,61 +285,67 @@ export const sendMessage = async (userMessage, conversationHistory = []) => {
     // Get user context
     const context = await getUserContext();
 
-    // Try to use free Hugging Face API (no credit card needed!)
-    try {
-      // Используем бесплатную модель Mistral-7B через Hugging Face Inference API
-      const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          inputs: `<s>[INST] Ты персональный AI-помощник в приложении MindFlow для студентов. Помогай с настроением, продуктивностью, мотивацией. Отвечай ТОЛЬКО на русском языке, кратко (2-3 предложения), эмпатично.
+    // Try to use OpenRouter API with Claude (real AI server)
+    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+    
+    if (apiKey) {
+      try {
+        // Build conversation history for context
+        const messages = [
+          {
+            role: 'system',
+            content: `Ты персональный AI-помощник в приложении MakarovFlow для студентов. Помогай с настроением, продуктивностью, мотивацией, сном и учёбой. Отвечай ТОЛЬКО на русском языке, кратко (2-4 предложения), эмпатично и дружелюбно. Используй контекст пользователя для персонализированных ответов.
 
-${context}
-
-Вопрос пользователя: ${userMessage} [/INST]`,
-          parameters: {
-            max_new_tokens: 250,
-            temperature: 0.7,
-            top_p: 0.95,
-            return_full_text: false
+Контекст пользователя:
+${context}`
+          },
+          ...conversationHistory.map(msg => ({
+            role: msg.role === 'user' ? 'user' : 'assistant',
+            content: msg.content
+          })),
+          {
+            role: 'user',
+            content: userMessage
           }
-        })
-      });
+        ];
 
-      if (response.ok) {
-        const data = await response.json();
-        let aiMessage = '';
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+            'HTTP-Referer': window.location.origin,
+            'X-Title': 'MakarovFlow'
+          },
+          body: JSON.stringify({
+            model: 'anthropic/claude-3.5-sonnet',
+            messages: messages,
+            max_tokens: 300,
+            temperature: 0.7
+          })
+        });
 
-        if (Array.isArray(data) && data[0]?.generated_text) {
-          aiMessage = data[0].generated_text.trim();
-        } else if (data.generated_text) {
-          aiMessage = data.generated_text.trim();
-        } else if (data.error) {
-          // API вернул ошибку (например, модель загружается)
-          logger.info('Hugging Face API error:', data.error);
-          throw new Error(data.error);
+        if (response.ok) {
+          const data = await response.json();
+          const aiMessage = data.choices?.[0]?.message?.content?.trim();
+
+          if (aiMessage && aiMessage.length > 5) {
+            return {
+              success: true,
+              message: aiMessage
+            };
+          }
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          logger.info('OpenRouter API error:', response.status, errorData);
+          // Fall through to fallback
         }
-
-        // Если получили ответ на английском или странный, используем fallback
-        if (aiMessage && aiMessage.length > 10 && !aiMessage.includes('[/INST]')) {
-          // Переводим на русский если нужно и очищаем
-          aiMessage = aiMessage.replace(/\[INST\].*?\[\/INST\]/g, '').trim();
-          aiMessage = aiMessage.replace(/^\[INST\].*?\[\/INST\]/g, '').trim();
-
-          return {
-            success: true,
-            message: aiMessage
-          };
-        }
-      } else {
-        // Если ответ не OK, логируем и используем fallback
-        const errorData = await response.json().catch(() => ({}));
-        logger.info('Hugging Face API returned error:', response.status, errorData);
+      } catch (apiError) {
+        logger.error('OpenRouter API error:', apiError);
+        // Fall through to fallback
       }
-    } catch (apiError) {
-      logger.info('Hugging Face API error, using fallback:', apiError.message);
+    } else {
+      logger.info('OpenRouter API key not configured, using fallback');
     }
 
     // Fallback to smart local responses

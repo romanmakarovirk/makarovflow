@@ -34,7 +34,7 @@ const MoodSelector = ({ value, onChange }) => {
               whileTap={{ scale: 0.9 }}
               onClick={() => handleMoodClick(mood.value, mood.emoji)}
               className={`
-                flex-1 aspect-square rounded-2xl flex flex-col items-center justify-center
+                flex-1 aspect-square rounded-2xl flex flex-col items-center justify-center gap-1
                 transition-all duration-200 border
                 ${isSelected
                   ? mood.color
@@ -45,10 +45,10 @@ const MoodSelector = ({ value, onChange }) => {
               <span className={`text-3xl transition-transform ${isSelected ? 'scale-110' : ''}`}>
                 {mood.emoji}
               </span>
-              <span className={`text-xs mt-2 font-medium ${
+              <span className={`text-[10px] mt-1 font-medium text-center leading-tight px-1 ${
                 isSelected ? 'text-white' : 'text-gray-500'
               }`}>
-                {mood.label.split(' ')[0]}
+                {mood.label.length > 8 ? mood.label.split(' ')[0] : mood.label}
               </span>
             </motion.button>
           );

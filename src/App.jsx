@@ -63,8 +63,6 @@ function App() {
         }}
       />
 
-      {/* Тонкая временная линия слева как в планировщике */}
-      <div className="pointer-events-none absolute left-4 top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-purple-400/40 to-transparent -z-10" />
 
       <div className="relative z-10 px-4 sm:px-6 pt-6">
         <OfflineIndicator />
