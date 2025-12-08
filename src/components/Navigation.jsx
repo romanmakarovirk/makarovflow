@@ -10,7 +10,7 @@ const Navigation = () => {
 
   // Определяем цвет фона навигации в зависимости от текущей страницы
   // Светлый frosted glass эффект в стиле Apple
-  const getNavBackground = () => 'rgba(12, 18, 32, 0.82)'; // Темное стекло с насыщенностью
+  const getNavBackground = () => 'rgba(20, 25, 40, 0.85)'; // Более светлое стекло
 
   const navItems = [
     { id: 'journal', icon: BookOpen, label: 'Дневник' },
@@ -50,9 +50,9 @@ const Navigation = () => {
           borderRadius: '28px',
           // Глубокая тень с легким свечением
           boxShadow: `
-            0 20px 70px rgba(0, 0, 0, 0.45),
-            0 0 0 1px rgba(255, 255, 255, 0.05),
-            inset 0 1px 0 rgba(255, 255, 255, 0.08)
+            0 20px 60px rgba(0, 0, 0, 0.35),
+            0 0 0 1px rgba(255, 255, 255, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.12)
           `,
           // Тонкая граница для эффекта стекла
           border: '0.5px solid rgba(255, 255, 255, 0.08)',

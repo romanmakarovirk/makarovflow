@@ -98,7 +98,7 @@ const Journal = () => {
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent tracking-tight">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-300 via-purple-300 to-cyan-300 bg-clip-text text-transparent tracking-tight">
             {t('journal.title')}
           </h1>
           {!showCheckIn && (
@@ -130,16 +130,12 @@ const Journal = () => {
 
         {/* Today's Entry Status */}
         {!showCheckIn && todayEntry && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="bg-gradient-to-r from-green-500/20 to-teal-600/20 border border-green-500/30 rounded-2xl p-5"
-          >
+          <Card className="bg-gradient-to-r from-emerald-500/15 to-teal-500/15 border-emerald-500/20 p-5">
             <div className="flex items-center gap-4">
               <span className="text-4xl">{todayEntry.moodEmoji}</span>
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600 mb-1">Запись на сегодня создана</p>
-                <div className="flex items-center gap-3 text-xs text-gray-500">
+                <p className="text-sm font-medium text-slate-200 mb-1">Запись на сегодня создана</p>
+                <div className="flex items-center gap-3 text-xs text-slate-400">
                   <span>Настроение {todayEntry.mood}/10</span>
                   <span>•</span>
                   <span>Энергия {todayEntry.energy}%</span>
@@ -148,7 +144,7 @@ const Journal = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </Card>
         )}
 
         {/* Empty State */}
@@ -221,28 +217,32 @@ const Journal = () => {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <Card className="p-4 bg-gradient-to-br from-pink-500/10 to-transparent border-pink-500/20">
+              <Card className="p-4 bg-gradient-to-br from-pink-500/10 to-transparent border-pink-500/20 relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-pink-400 to-pink-600" />
                 <Heart size={18} className="text-pink-400 mb-2" />
                 <p className="text-2xl font-bold text-pink-300">{analytics.avgMood.toFixed(1)}</p>
-                <p className="text-xs text-gray-400 mt-1">Настроение</p>
+                <p className="text-xs text-slate-400 mt-1">Настроение</p>
               </Card>
 
-              <Card className="p-4 bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-500/20">
+              <Card className="p-4 bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-500/20 relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-yellow-400 to-yellow-600" />
                 <Zap size={18} className="text-yellow-400 mb-2" />
                 <p className="text-2xl font-bold text-yellow-300">{analytics.avgEnergy.toFixed(0)}%</p>
-                <p className="text-xs text-gray-400 mt-1">Энергия</p>
+                <p className="text-xs text-slate-400 mt-1">Энергия</p>
               </Card>
 
-              <Card className="p-4 bg-gradient-to-br from-blue-500/10 to-transparent border-blue-500/20">
+              <Card className="p-4 bg-gradient-to-br from-blue-500/10 to-transparent border-blue-500/20 relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 to-blue-600" />
                 <Moon size={18} className="text-blue-400 mb-2" />
                 <p className="text-2xl font-bold text-blue-300">{analytics.avgSleep.toFixed(1)}ч</p>
-                <p className="text-xs text-gray-400 mt-1">Сон</p>
+                <p className="text-xs text-slate-400 mt-1">Сон</p>
               </Card>
 
-              <Card className="p-4 bg-gradient-to-br from-emerald-500/10 to-transparent border-emerald-500/20">
+              <Card className="p-4 bg-gradient-to-br from-emerald-500/10 to-transparent border-emerald-500/20 relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-400 to-emerald-600" />
                 <TrendingUp size={18} className="text-emerald-400 mb-2" />
                 <p className="text-2xl font-bold text-emerald-300">{stats?.currentStreak || 0}</p>
-                <p className="text-xs text-gray-400 mt-1">Streak 🔥</p>
+                <p className="text-xs text-slate-400 mt-1">Streak 🔥</p>
               </Card>
             </div>
           </motion.div>
@@ -265,8 +265,9 @@ const Journal = () => {
               {/* Schedule Widget */}
               <Card
                 onClick={() => { haptic.light(); setShowSchedule(true); }}
-                className="p-4 bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/20 hover:border-orange-500/40 transition-all cursor-pointer group"
+                className="p-4 bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/20 hover:border-orange-500/40 transition-all cursor-pointer group relative overflow-hidden"
               >
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-orange-400 to-red-500" />
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 flex items-center justify-center">
                     <Calendar size={20} className="text-orange-400" />
@@ -300,8 +301,9 @@ const Journal = () => {
               {/* Homework Widget */}
               <Card
                 onClick={() => { haptic.light(); setShowHomework(true); }}
-                className="p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20 hover:border-blue-500/40 transition-all cursor-pointer group"
+                className="p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20 hover:border-blue-500/40 transition-all cursor-pointer group relative overflow-hidden"
               >
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 to-cyan-500" />
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
                     <BookCheck size={20} className="text-blue-400" />
@@ -337,8 +339,9 @@ const Journal = () => {
               {/* Calculator Widget */}
               <Card
                 onClick={() => { haptic.light(); setShowGPA(true); }}
-                className="p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer group"
+                className="p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer group relative overflow-hidden"
               >
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-400 to-pink-500" />
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
                     <Calculator size={20} className="text-purple-400" />

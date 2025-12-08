@@ -149,11 +149,11 @@ const AIAssistant = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="min-h-screen pb-32"
+      className="min-h-screen pb-40"
     >
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-to-b from-gray-900 via-gray-900/95 to-gray-900/70 backdrop-blur-xl border-b border-white/5 p-4">
+        <div className="sticky top-0 z-10 bg-gradient-to-b from-[#0a0f1f]/95 via-[#0c1220]/95 to-transparent backdrop-blur-xl border-b border-white/5 p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-purple-500/25">
@@ -272,8 +272,8 @@ const AIAssistant = () => {
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                     message.role === 'user'
-                      ? 'bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 text-gray-900 shadow-lg shadow-purple-500/25'
-                      : 'bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl border border-white/10 text-gray-700'
+                      ? 'bg-gradient-to-r from-[#7c7eff] via-[#6c7bff] to-[#3fc5ff] text-slate-50 shadow-lg shadow-purple-500/30'
+                      : 'bg-gradient-to-br from-[#101727]/85 via-[#0c1220]/85 to-[#0a101d]/90 backdrop-blur-xl border border-white/10 text-slate-200 shadow-lg'
                   }`}
                 >
                   <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
@@ -288,8 +288,8 @@ const AIAssistant = () => {
               animate={{ opacity: 1, y: 0 }}
               className="flex justify-start"
             >
-              <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3">
-                <div className="flex items-center gap-2 text-gray-400">
+              <div className="bg-gradient-to-br from-[#101727]/85 via-[#0c1220]/85 to-[#0a101d]/90 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3 shadow-lg">
+                <div className="flex items-center gap-2 text-slate-400">
                   <Loader size={16} className="animate-spin" />
                   <span className="text-sm">Думаю...</span>
                 </div>
@@ -302,9 +302,9 @@ const AIAssistant = () => {
       </div>
 
       {/* Input */}
-      <div className="fixed bottom-20 left-0 right-0 p-4 bg-gradient-to-t from-gray-900 via-gray-900/98 to-gray-900/80 backdrop-blur-2xl border-t border-white/5">
+      <div className="fixed bottom-28 left-0 right-0 p-4 z-40 bg-gradient-to-t from-[#0a0f1f]/95 via-[#0c1220]/95 to-transparent backdrop-blur-2xl border-t border-white/5">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-2 bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-lg">
+          <div className="flex items-center gap-2 bg-gradient-to-br from-[#101727]/90 via-[#0c1220]/90 to-[#0a101d]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-3 shadow-lg ring-1 ring-white/5">
             <input
               type="text"
               value={input}
@@ -317,14 +317,14 @@ const AIAssistant = () => {
               }}
               placeholder="Напиши сообщение..."
               disabled={loading || remainingRequests === 0}
-              className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder-gray-500 px-3 py-2 disabled:opacity-50"
+              className="flex-1 bg-transparent border-none outline-none text-slate-100 placeholder-slate-500 px-3 py-2 disabled:opacity-50 text-sm"
             />
             <button
               onClick={() => handleSend()}
               disabled={!input.trim() || loading || remainingRequests === 0}
-              className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/25"
+              className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#7c7eff] via-[#6c7bff] to-[#3fc5ff] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/30"
             >
-              <Send size={18} className="text-gray-900" />
+              <Send size={18} className="text-slate-50" />
             </button>
           </div>
         </div>
